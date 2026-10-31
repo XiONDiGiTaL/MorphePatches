@@ -13,7 +13,7 @@ and is not a route to, Pro / paid-feature unlocks or ad removal.
 
 ## What is here
 
-- [`dark-mode/DarkModePatch.kt`](dark-mode/DarkModePatch.kt) — a Morphe
+- [`../patches/src/main/kotlin/app/xiondigital/patches/tandem/darkmode/DarkModePatch.kt`](../patches/src/main/kotlin/app/xiondigital/patches/tandem/darkmode/DarkModePatch.kt) — a Morphe
   `bytecodePatch` scaffold for Tandem, following the structure of the
   [Morphe patches template](https://github.com/MorpheApp/morphe-patches-template).
   Its theme fingerprint is still **TBD**: the stock Tandem APK has not been
@@ -25,7 +25,7 @@ and is not a route to, Pro / paid-feature unlocks or ad removal.
 2. Decompile it and find how Tandem initialises its theme — for example
    whether it uses AppCompat night mode, a custom theme flag, or a
    per-activity theme call.
-3. Replace the `TODO` fingerprint in `DarkModePatch.kt` with a fingerprint
+3. Replace the `TODO` fingerprint in `patches/src/main/kotlin/app/xiondigital/patches/tandem/darkmode/DarkModePatch.kt` with a fingerprint
    that matches that exact method (strings, signature, and opcodes), and
    add the matching theme-forcing instruction.
 4. Build the bundle locally and test it with Morphe Desktop on that exact
@@ -38,3 +38,18 @@ Until step 4 is done, do not present this folder as an installable patch.
 ## Main README
 
 Back to the collection: [../README.md](../README.md)
+
+## Building a .mpp bundle
+
+This repo is now a standard Morphe patches project, like hoo-dles:
+
+- Build locally (requires Java 21 and the Morphe registry access used by
+  the template): `./gradlew :patches:buildAndroid`
+- The bundle is `patches/build/libs/patches-*.mpp`
+- A release is only created by semantic release on `main`/`dev` for
+  `feat:`/`fix:` commits. A `chore:`/`docs:` commit, like this structure
+  change, only verifies that the project compiles in GitHub Actions —
+  it does not publish a bundle.
+
+Do not release a bundle until the dark-mode fingerprint is added and
+tested on a recorded Tandem version.

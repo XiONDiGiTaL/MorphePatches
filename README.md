@@ -1,15 +1,28 @@
+<!-- Styling based on xiondigital.net (assets/css/xion.css):
+     Dark editorial palette: bg #050607, panel #0c0e11 / #101318,
+     ink #ecedef, body #bdc3cc, muted #8b9099,
+     accent blue #3f80ff, blue-hi #79a8ff.
+     Type on the site: Sora (display/body), Instrument Serif (italic accents),
+     JetBrains Mono (eyebrow/labels). GitHub READMEs cannot load external
+     fonts or site CSS, so this translates those cues into GitHub-safe
+     elements: centred header, mono eyebrow, italic tagline, and blue badges. -->
+
 <div align="center">
 
-<sub>XiONDiGiTaL</sub>
+`MORPHE PATCHES — XIONDIGITAL`
 
-# Patches
+# XiØN Patches
 
-Independent Android patches and adaptations for [Morphe](https://morphe.software).
+*Independent Android patches and adaptations for [Morphe](https://morphe.software).*
 
-<a href="https://xiondigital.net">Website ↗</a> &nbsp; / &nbsp;
-<a href="#patches">Patches</a> &nbsp; / &nbsp;
-<a href="#releases">Releases</a> &nbsp; / &nbsp;
-<a href="#requests-and-issues">Requests</a>
+[![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
+[![Status: Early development](https://img.shields.io/badge/Status-Early_development-79a8ff?style=flat-square)](#releases)
+[![Website](https://img.shields.io/badge/Website-xiondigital.net-0c0e11?style=flat-square)](https://xiondigital.net)
+
+<a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
+<a href="#releases">02 / Releases</a> &nbsp; / &nbsp;
+<a href="#requests-and-issues">03 / Requests</a> &nbsp; / &nbsp;
+<a href="https://xiondigital.net">Website ↗</a>
 
 </div>
 
@@ -128,8 +141,10 @@ This project is intended to share independent modifications, not redistribute pr
 
 <div align="center">
 
-<a href="https://xiondigital.net">XiONDiGiTaL ↗</a>
+---
 
-<sub>Independent patch collection</sub>
+<a href="https://xiondigital.net">XiØN · XiONDiGiTaL ↗</a>
+
+<sub>Independent patch collection — xiondigital.net</sub>
 
 </div>

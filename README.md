@@ -63,11 +63,13 @@ No app versions verified yet.
 
 | App | Package | Patches |
 | --- | --- | --- |
-| Tandem | `net.tandem` | Dark mode (Planned)<br>Remove ads (Planned)<br>Local Pro-related controls (Research planned)<br>Profile visitor display (Feasibility unverified) |
+| [Tandem](Tandem/) | `net.tandem` | Dark mode (Planned)<br>Remove ads (Planned)<br>Local Pro-related controls (Research planned)<br>Profile visitor display (Feasibility unverified) |
 
 Supported versions: none verified.
 
-> These are investigation targets, not available patches. The APK has not been inspected, and no changes have been implemented or tested. Server-managed features may not be accessible through local changes.
+Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) — dark-mode work in progress only; no bundle to install yet.
+
+> These are investigation targets, not available patches. A dark-mode scaffold exists in Tandem/, but its theme fingerprint is still TBD — the APK has not been inspected for it, and no patch has been tested as working. Server-managed features may not be accessible through local changes.
 
 <details>
 <summary>Future projects</summary>

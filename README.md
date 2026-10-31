@@ -1,6 +1,6 @@
 <div align="center">
 
-<sub>XiØN DIGITAL / ANDROID PATCH LAB</sub>
+<sub>XiONDiGiTaL / ANDROID PATCH LAB</sub>
 
 # MØRPHE PATCHES
 
@@ -8,7 +8,7 @@
 
 Independent patch projects for Morphe — appearance, usability, and app-level experiments.
 
-[XiØN Digital](https://xiondigital.net) · [Morphe](https://morphe.software) · [Project roadmap](#03--project-roadmap) · [Official documentation](https://github.com/MorpheApp/morphe-documentation)
+[XiONDiGiTaL](https://xiondigital.net) · [Morphe](https://morphe.software) · [Project roadmap](#03--project-roadmap) · [Official documentation](https://github.com/MorpheApp/morphe-documentation)
 
 </div>
 
@@ -165,7 +165,7 @@ This repository is intended for patch source, documentation, and original projec
 
 <div align="center">
 
-<sub>XiØN DIGITAL / BUILD · TEST · REFINE</sub>
+<sub>XiONDiGiTaL / BUILD · TEST · REFINE</sub>
 
 One lab. Multiple apps. A patch at a time.
 

@@ -48,30 +48,13 @@ No app versions verified yet.
 
 ## 01 / Patches
 
-<table>
-<tr>
-<td valign="top">
-
-<sub>FIRST PROJECT / PLANNED</sub>
-
-### Tandem
-
-Appearance, ad-related adjustments, and locally controlled feature research.
-
-| Candidate patch | Status |
-| :--- | :--- |
-| Dark mode | Planned |
-| Remove ads | Planned |
-| Local Pro-related controls | Research planned |
-| Profile visitor display | Feasibility unverified |
+| App | Package | Patches |
+| --- | --- | --- |
+| Tandem | `net.tandem` | Dark mode (Planned)<br>Remove ads (Planned)<br>Local Pro-related controls (Research planned)<br>Profile visitor display (Feasibility unverified) |
 
 Supported versions: none verified.
 
-These are investigation targets, not available patches. The APK has not been inspected, and no changes have been implemented or tested. Server-managed features may not be accessible through local changes.
-
-</td>
-</tr>
-</table>
+> These are investigation targets, not available patches. The APK has not been inspected, and no changes have been implemented or tested. Server-managed features may not be accessible through local changes.
 
 <details>
 <summary>Future projects</summary>
@@ -112,6 +95,22 @@ There is currently nothing to install from this repository. Original and prepatc
 [Suggest a patch or report an issue ↗](https://github.com/XiONDiGiTaL/MorphePatches/issues)
 
 For future bug reports, include the app version, patch bundle version, selected patches, Android version, and reproduction steps. Remove personal information and credentials from logs. Requests do not guarantee implementation or compatibility.
+
+<br />
+
+## Frequently Asked Questions
+
+#### How do I use this?
+
+There is currently nothing to install from this repository. A source link for Morphe will be added after the first compatible bundle is built and verified.
+
+#### What APK version should I use?
+
+None verified yet. Supported versions will be listed alongside each patch once a version has been tested.
+
+#### Can you make a patch for another app?
+
+Suggest it through Issues. Requests do not guarantee implementation or compatibility.
 
 <br />
 

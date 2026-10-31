@@ -59,7 +59,7 @@ No app versions verified yet.
 
 <a id="patches"></a>
 
-## 01 / Patches
+## 01 / Morphe Patches
 
 | App | Package | Patches |
 | --- | --- | --- |

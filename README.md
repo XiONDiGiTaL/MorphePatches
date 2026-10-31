@@ -21,7 +21,7 @@ Independent Android patches and adaptations for [Morphe](https://morphe.software
 
 ### The collection
 
-Custom patches by XiONDiGiTaL, offered freely. Appearance changes, interface refinements, and app-specific adaptations—organized by application, with compatibility and release details alongside each project.
+Custom patches by XiONDiGiTaL, offered freely. Appearance changes, interface refinements, and app-specific adaptations, organized by application, with compatibility and release details alongside each project.
 
 Tandem is the first attempt. More projects will join the collection as work begins.
 

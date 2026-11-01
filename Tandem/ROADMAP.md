@@ -91,11 +91,13 @@ warning about silently uploading private messages.
 | AI Toolkit | UI exists, work is done remotely against an authenticated account | **Server-authoritative** |
 | Multiple Learning Languages | account data model, not a local list | **Server-authoritative** |
 | Translation Limits | `translationLimit` in server props | **Server-authoritative** |
-| Ad Removal | AppLovin MAX and AdMob are both present and rendered locally, behind `EXTRA_SHOW_INTERSTITIAL_AD_TRIGGER` and per-format gates | **Technically patchable, not shipped** |
+| Ad Removal | AppLovin MAX and Meta Audience Network request the ads; the community slot renders `CommunityAdConfig("ca-app-pub-4507927355231659/3667237836", …)` | **Shipped** — see below |
 
-On the last row: the paths exist and suppression would not touch billing, but ad removal is one of
-the paid perks of Tandem Pro, so shipping it here would be the same forged-entitlement bargain
-covered in the ELAmods analysis. It stays documented rather than implemented.
+On the last row: ad delivery is decided by the client, not by the account. The community slot is one
+composable and the SDKs' `loadAd` methods are kept-name anchors, so both are patchable without
+touching billing or entitlement — which is different in kind from forging an `isPro` answer, since it
+only drops third-party ad requests. Rewarded formats, which the user opens deliberately, are left
+alone.
 
 ## What this repository will actually ship
 
@@ -106,8 +108,8 @@ Only items where the change lives inside a method that already exists:
 | Bypass PairIP checks | **Shipped** | `SignatureCheck.verifyIntegrity` and `LicenseClient.checkLicense` reduced to `return-void`; required for any re-signed build to start |
 | Force dark mode | **Shipped** | `UiModeManager.setApplicationNightMode(2)` at `TandemApp.onCreate()` |
 | Disable Adjust tracking | **Shipped** | `Adjust.initSdk(AdjustConfig)` reduced to `return-void`; 246-class attribution SDK never initialises |
+| Remove ads | **Shipped** | Community-ad composable plus the AppLovin MAX and Meta Audience Network `loadAd` methods reduced to `return-void`; rewarded formats untouched |
 | Default voice-note playback speed | Candidate | Requires tracing the obfuscated player; a fixed speed, not a menu |
-| Ad path suppression | Documented, not shipped | See above |
 
 Everything else on the requested list needs its own application, not a patch.
 

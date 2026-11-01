@@ -5,7 +5,7 @@ Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built f
 
 | | |
 | :--- | :--- |
-| Bundle | [`patches.mpp`](patches.mpp) — 38,109 bytes, `sha256 0d0f332ca620f64816adc6c034852929ddd8bc59525c3b50abde7707e565bb2f` |
+| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes, `sha256 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03` |
 | Supported app | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Required patcher | Morphe patcher **2.1.0** (bundles declare `Patcher-Version: 2.1.0`) |
 | Status | **Experimental** — builds, loads and patches 6.38.0; not yet run on a device |
@@ -111,6 +111,47 @@ no-ops once `initSdk` is skipped. Tandem's deep-link handler is registered separ
 application object and is unaffected. The app's Firebase Analytics helper is a different SDK and is
 not touched by this patch.
 
+### Remove ads
+
+**What it does.** Removes Tandem's community ad slot and stops the two bundled ad SDKs from
+requesting ads, so no app-open, banner, interstitial or native ad is delivered.
+
+**Where the ads actually come from.** Two independent paths, both covered:
+
+| Path | Anchor in 6.38.0 | How it is removed |
+| :--- | :--- | :--- |
+| Tandem's community ad slot | `Ljhp;->a(Lex4;Lf79;Lpw4;Leh;Lbg5;I)V`, the one composable that consumes `CommunityAdConfig(adUnitId, adSize)` with unit `ca-app-pub-4507927355231659/3667237836` | Body becomes `return-void`, so the slot emits nothing — exactly the branch the screen already takes when the config is `null` |
+| AppLovin MAX | `MaxAppOpenAd.loadAd()`, `MaxInterstitialAd.loadAd()`, `MaxAdView.loadAd()`, `MaxAdView.startAutoRefresh()` | Bodies become `return-void`, so no request is made and `isReady()` stays false |
+| Meta Audience Network | `InterstitialAd.loadAd()` + `loadAd(InterstitialLoadAdConfig)`, `AdView.loadAd()` + `loadAd(AdViewLoadConfig)`, `NativeAdBase.loadAd()` + `loadAd(NativeLoadAdConfig)` | Same, for both call styles |
+
+**Verified anchors** (stock 6.38.0 `base.apk`):
+
+```smali
+Ljhp;->a(Lex4;Lf79;Lpw4;Leh;Lbg5;I)V                                      # public static
+Lcom/applovin/mediation/ads/MaxAppOpenAd;->loadAd()V                      # public
+Lcom/applovin/mediation/ads/MaxInterstitialAd;->loadAd()V                 # public
+Lcom/applovin/mediation/ads/MaxAdView;->loadAd()V                         # public
+Lcom/applovin/mediation/ads/MaxAdView;->startAutoRefresh()V               # public
+Lcom/facebook/ads/InterstitialAd;->loadAd()V                              # public
+Lcom/facebook/ads/InterstitialAd;->loadAd(Lcom/facebook/ads/InterstitialAd$InterstitialLoadAdConfig;)V
+Lcom/facebook/ads/AdView;->loadAd()V                                      # public
+Lcom/facebook/ads/AdView;->loadAd(Lcom/facebook/ads/AdView$AdViewLoadConfig;)V
+Lcom/facebook/ads/NativeAdBase;->loadAd()V                                # public
+Lcom/facebook/ads/NativeAdBase;->loadAd(Lcom/facebook/ads/NativeAdBase$NativeLoadAdConfig;)V
+```
+
+R8 relocates Tandem's own classes into the default package — jadx writes those under
+`defpackage/` — which is why the community-ad composable's descriptor is the one-letter `Ljhp;`,
+while the SDK classes keep their package names because their consumer rules preserve the API
+surface.
+
+**What is deliberately left alone.** Rewarded formats (`MaxRewardedAd`, `RewardedVideoAd`,
+`RewardedInterstitialAd`) are untouched: they are only requested when the user asks for one, so
+blocking them would remove a feature instead of an annoyance. The SDKs' own `init` calls are
+untouched too — nothing loads without one of the replaced methods, and gutting initialisation would
+break the mediation callbacks Tandem has registered. Nothing here reads or writes billing, purchase
+state or entitlement.
+
 ---
 
 ## Tandem Pro: what is client-side and what is not
@@ -182,19 +223,18 @@ profile visitors: the visitor list is a server response, not a local flag.
 
 ## Ads
 
-- The client bundles **AdMob** (`com.google.android.gms.ads`, app id `ca-app-pub-…`), **AppLovin MAX**
-  (`com.applovin`, with its mediation debugger activities) and **Meta Audience Network**
-  (`assets/audience_network/*.dex`).
-- Ad placement logic lives in Tandem's own **obfuscated** classes (`defpackage`), and renamings change
-  between releases, so there is no stable, version-safe anchor to hook in a 6.38.0-only patch.
-- Ads are also tied to the entitlement above: the app's own Pro upsell reads *"Remove ads and enjoy
-  Language Parties completely distraction-free."* and *"Remove ads and continue connecting with
-  members distraction-free."* Removing ad rendering would therefore produce a paid benefit without
-  the purchase, i.e. the same server-side problem as Pro.
-- No client-side "ads off" switch or remote-config key for ad display was found in the 6.38.0 code.
+Ad handling is **implemented** — see [Remove ads](#remove-ads). What the 6.38.0 bundle showed:
 
-Ad handling is therefore **not implemented**; the ad SDKs are left fully intact and the investigation
-is recorded here rather than guessed at.
+- The client bundles **AdMob** (app id under `ca-app-pub-…`), **AppLovin MAX** (`com.applovin`, with
+  its mediation debugger activities) and **Meta Audience Network** (`assets/audience_network/*.dex`).
+- The community ad slot is Tandem's own Compose slot: the view model emits
+  `CommunityAdConfig("ca-app-pub-4507927355231659/3667237836", MEDIUM_RECTANGLE)` and a single
+  composable renders it. AdMob's own view classes are not in the dex, so the slot — not an SDK call —
+  is the choke point for that placement.
+- Ads are tied to the Pro upsell: the app's own copy reads *"Remove ads and enjoy Language Parties
+  completely distraction-free."* That is why dropping the ad *requests* is treated differently from
+  the Pro flags above: it is a client-side behaviour change that sends fewer requests to third
+  parties, not a forged entitlement or a rewritten server answer.
 
 ---
 
@@ -234,8 +274,8 @@ releases do this automatically via semantic release on `main`/`dev`.
 1. Use Tandem **6.38.0** (versionCode 11568).
 2. In Morphe Manager, import [`patches.mpp`](patches.mpp) (or the bundle you just built).
 3. Select your Tandem file, keep **Bypass PairIP checks** enabled (without it a re-signed
-   build does not start), enable **Force dark mode** and **Disable Adjust tracking** as wanted,
-   then patch and install.
+   build does not start), enable **Force dark mode**, **Remove ads** and **Disable Adjust tracking**
+   as wanted, then patch and install.
 4. The patched build is signed differently from the store build, so remove the stock app first and
    keep your login details handy.
 
@@ -253,6 +293,8 @@ dex patch can deliver, what needs new app code, and what is server-authoritative
   destination and a persisted preference in Tandem's own settings architecture.
 - **Only night-aware UI changes.** Screens, WebViews or ad creatives that ignore `uiMode` look the
   same as they do today with system dark mode on.
+- **Rewarded ads stay.** Formats the user explicitly opens to earn something are not blocked, by
+  design; only the unrequested placements and the community ad slot are removed.
 - **Single known-good version**, by design.
 - **PairIP stays on.** A patched build may still be refused by Tandem's integrity checks; that risk
   is inherent to patching this app and is not worked around.
@@ -267,6 +309,7 @@ dex patch can deliver, what needs new app code, and what is server-authoritative
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
 | Patch applies to the real 6.38.0 `base.apk` (fingerprint match + dex assembly) | Pass |
 | Injected call present in the compiled patched dex | Pass — the patched dex decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()`, before `super.onCreate()` |
+| Ad anchors present in the stock dex | Pass — the community-ad composable and all ten SDK load methods match in `classes.dex`/`classes4.dex` of the reference `base.apk` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
 | Dark mode correct on major screens, dialogs, navigation | **Not tested** — no device or emulator available |
 | Login, messaging, language exchange, settings, billing unaffected | **Not tested** — same reason |
@@ -293,6 +336,10 @@ theme dark — is kept; its structure is not relied on.
 
 ## Changelog
 
+- **Unreleased** — `Remove ads`: Tandem's community-ad composable (`Ljhp;->a`) reduced to
+  `return-void`, and the AppLovin MAX and Meta Audience Network load methods likewise, so no ad is
+  requested or rendered. All eleven anchors verified in the stock `base.apk` (`classes.dex`,
+  `classes4.dex`). Rewarded formats and SDK initialisation left intact.
 - **Unreleased** — `Bypass PairIP checks`: `SignatureCheck.verifyIntegrity` and
   `LicenseClient.checkLicense` bodies replaced with `return-void`, so a re-signed 6.38.0 build
   starts. Both anchors verified in the stock `base.apk` (`classes2.dex`). Not yet run on a device.

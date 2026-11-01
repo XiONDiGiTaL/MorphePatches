@@ -63,24 +63,24 @@ No app versions verified yet.
 
 | App | Package | Patches |
 | --- | --- | --- |
-| [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
+| [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
 
-Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 38,109 bytes,
-`sha256 0d0f332ca620f64816adc6c034852929ddd8bc59525c3b50abde7707e565bb2f`. Import it in Morphe
+Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 54,178 bytes,
+`sha256 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03`. Import it in Morphe
 Manager, or patch your stock Tandem 6.38.0 file with it directly.
 
 Supported versions: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK. The bundle builds
 and applies to that exact build; it has not been run on a device yet.
 
 Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) —
-`Bypass PairIP checks`, `Force dark mode` and `Disable Adjust tracking` are implemented for 6.38.0 only, and the prebuilt bundle is checked in next to its
-docs.
+`Bypass PairIP checks`, `Force dark mode`, `Remove ads` and `Disable Adjust tracking` are implemented for 6.38.0 only, and the prebuilt bundle is checked in
+next to its docs.
 
-> Tandem Pro features (profile visitors included) and ad removal are not implemented. Both are decided
-> by Tandem's servers rather than by a client switch: entitlement and limits arrive per response as
-> `isUserPro` / `visitorsLimit` / `isPro` fields, with no local Pro flag to enable. Doing it anyway
-> would mean forging entitlement payloads, which this collection does not do. The evidence and the
-> full client/server breakdown are in [Tandem/README.md](Tandem/README.md).
+> Tandem Pro features (profile visitors included) are not implemented: entitlement and limits arrive
+> per response as `isUserPro` / `visitorsLimit` / `isPro` fields, with no local Pro flag to enable, so
+> doing it would mean forging entitlement payloads. Ad requests are a different case and are
+> removable client-side, which is what `Remove ads` does. The evidence and the full client/server
+> breakdown are in [Tandem/README.md](Tandem/README.md).
 
 ### Generated patch list
 

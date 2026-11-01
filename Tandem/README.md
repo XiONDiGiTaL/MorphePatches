@@ -94,6 +94,36 @@ Consequences, stated plainly:
 So: Pro features, profile visitors included, are **not implemented — technically blocked by
 server-side entitlement**, not by preference.
 
+### How a working 6.11.1 "Premium" mod did it
+
+A Tandem 6.11.1 build distributed as "Premium (Mod by ElaMods)" (`sha256
+3b387e5f65c1a1ac3f0c2916183348c2273262cb2bc96c200922dd914cfe5d19`, 255 MB) was decompiled for
+comparison. It contains exactly two kinds of change, and neither touches the server:
+
+1. **MT Manager's ApkSignatureKiller.** An injected 17 KB `classes6.dex` holding
+   `bin/mt/signature/KillerApplication`, plus `assets/SignatureKiller/origin.apk` and a native
+   `libsigner.so`. It makes the re-signed APK report the original app signature. (6.11.1 has no
+   PairIP; the 6.38.0 build discussed above does.)
+2. **Five getters forced to `return true`**, each still reading its field first — the signature of a
+   hand edit that swaps the return register for `const/4 v0, 0x1`:
+
+   | Class | Method | Field |
+   | :--- | :--- | :--- |
+   | `net.tandem.core_new.models.MyProfile` | `isPro()` | `isPro` |
+   | `net.tandem.core_new.models.UserProfile` | `isPro()` | `isPro` |
+   | `net.tandem.kmp.sdk.presence.states.PresenceStateInternal` | `isPro()` | `isPro` |
+   | `net.tandem.parties.core.models.LocalMember` | `isPro()` | `isPro` |
+   | `net.tandem.pro_core.models.Product` | `isLifetime()` | `isLifetime` |
+
+What it deliberately leaves alone matters just as much: `MyProfileMetaData.isPro()`
+(language-change limits), `Visitor.isPro()`, `ConversationLimitProps.isPro()`,
+`NewRoomState.isProUser()` and `MyLanguagesState.isPro()` still return the server's value.
+
+The effect is that the app *believes* the account is Pro — Pro badge, Pro-only UI such as the city
+filter, purchase/deeplink screens — while every quota and every server-answered question still comes
+back as non-Pro. That is the entire technique, and it is exactly why such a mod cannot deliver
+profile visitors: the visitor list is a server response, not a local flag.
+
 ## Ads
 
 - The client bundles **AdMob** (`com.google.android.gms.ads`, app id `ca-app-pub-…`), **AppLovin MAX**
@@ -189,7 +219,9 @@ experimental.
 ## A note on the older ELAmods Tandem patch
 
 The older ELAmods Tandem patch was treated as historical reference only and **no code from it was
-copied**. This repository's history contains no ELAmods source for Tandem: the folder previously held
+copied**. A 6.11.1 build carrying that name was decompiled in November 2026 and is analysed in
+[How a working 6.11.1 "Premium" mod did it](#how-a-working-6111-premium-mod-did-it); it is a
+different app version and none of its code, smali or technique is used here. This repository's history contains no ELAmods source for Tandem: the folder previously held
 one scaffold (`Tandem/dark-mode/DarkModePatch.kt`, an empty `execute` block with a `TODO` fingerprint)
 and a placeholder file. The fingerprints, injected code and compatibility declaration here were
 derived from inspecting Tandem 6.38.0 itself. The scaffold's idea — a bytecode patch that turns the
@@ -201,6 +233,9 @@ theme dark — is kept; its structure is not relied on.
   the real APK; the empty scaffold is gone. Shared compatibility declarations and the
   `TandemApp.onCreate` fingerprint added. Pro, profile visitors and ads investigated and documented
   above: server-side entitlement, so not implemented. Prebuilt bundle checked in at `patches.mpp`.
+- **Unreleased** — ELAmods' 6.11.1 "Premium" build decompiled for comparison: its unlock is five
+  forced `isPro` / `isLifetime` getters (signature-killed APK, no PairIP at that version), leaving all
+  server-side limits intact. Recorded above; no code borrowed from it.
 
 ## Back to the collection
 

@@ -181,6 +181,12 @@ releases do this automatically via semantic release on `main`/`dev`.
 4. The patched build is signed differently from the store build, so remove the stock app first and
    keep your login details handy.
 
+## Requested features and what the APK can support
+
+The full feature list proposed for this patch (media tools, study workflow, speech tools, Pro
+targets) is triaged feature by feature against the 6.38.0 code in [ROADMAP.md](ROADMAP.md): what a
+dex patch can deliver, what needs new app code, and what is server-authoritative.
+
 ## Known limitations
 
 - **Not device-tested.** The bundle compiles, loads through Morphe's loader, and applies to the real

@@ -16,7 +16,7 @@
 *Independent Android patches and adaptations for [Morphe](https://morphe.software).*
 
 [![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
-[![Status: Early development](https://img.shields.io/badge/Status-Early_development-79a8ff?style=flat-square)](#releases)
+[![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
 [![Website](https://img.shields.io/badge/Website-xiondigital.net-0c0e11?style=flat-square)](https://xiondigital.net)
 
 <a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
@@ -32,25 +32,27 @@
 <tr>
 <td width="65%" valign="top">
 
-### The collection
+### What ships here
 
-Custom patches by XiONDiGiTaL, offered freely. Appearance changes, interface refinements, and app-specific adaptations, organized by application, with compatibility and release details alongside each project.
+Four working patches for **Tandem: Language exchange** 6.38.0, written against Morphe's patch API and
+shipped as a prebuilt bundle. Each one is a real change to Tandem's own dex, documented down to the
+method it anchors on and the exact code it injects.
 
-Tandem is the first entry: four patches for 6.38.0, compiled into a bundle you can import today. More
-projects will join the collection as work begins.
+Version `v1.0.0` is tagged with the bundle attached, so the Morphe source link resolves and lists all
+four patches for `net.tandem` 6.38.0.
 
 </td>
 <td width="35%" valign="top">
 
-### Development status
+### Release status
 
-Early development
+**v1.0.0** — 2026-11-01
 
-Tandem 6.38.0 — 4 patches, bundle checked in
+4 patches · `net.tandem` 6.38.0 · APK + APKM
 
-No GitHub release tagged yet
+Patch applies to the stock APK; not yet run on a device
 
-[View releases ↗](https://github.com/XiONDiGiTaL/MorphePatches/releases)
+[Downloads ↗](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest)
 
 </td>
 </tr>
@@ -66,22 +68,21 @@ No GitHub release tagged yet
 | --- | --- | --- |
 | [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
 
-Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 54,178 bytes,
-`sha256 f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`. Import it in Morphe
-Manager, or patch your stock Tandem 6.38.0 file with it directly.
+Two copies of the same bundle — take either:
 
-Supported versions: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK. The bundle builds
-and applies to that exact build; it has not been run on a device yet.
+| Where | File | Size | SHA-256 |
+| :--- | :--- | ---: | :--- |
+| [Release `v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) | `patches-1.0.0.mpp` | 54,103 B | `aa402bfed77657cdc4ee15d30908ddc5c6ac04a4c8e589b74247a7df6a107cd3` |
+| This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 54,178 B | `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d` |
 
-Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) —
-`Bypass PairIP checks`, `Force dark mode`, `Remove ads` and `Disable Adjust tracking` are implemented for 6.38.0 only, and the prebuilt bundle is checked in
-next to its docs.
+Both contain the same four patches and declare the same `Patcher-Version: 2.1.0`; the byte counts
+differ only because CI rebuilds the zip when it tags a release. Import either file in Morphe Manager,
+or patch your stock Tandem 6.38.0 file with it directly.
 
-> Tandem Pro features (profile visitors included) are not implemented: entitlement and limits arrive
-> per response as `isUserPro` / `visitorsLimit` / `isPro` fields, with no local Pro flag to enable, so
-> doing it would mean forging entitlement payloads. Ad requests are a different case and are
-> removable client-side, which is what `Remove ads` does. The evidence and the full client/server
-> breakdown are in [Tandem/README.md](Tandem/README.md).
+Supported: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK, minSdk 32. Any other
+version is refused by the bundle instead of being patched blindly. Fingerprint matches and dex
+assembly are verified against the stock APK; screen behaviour is not device-tested yet — the full
+status is in [Tandem/README.md](Tandem/README.md#testing-status).
 
 ### Generated patch list
 
@@ -111,12 +112,16 @@ next to its docs.
 
 ### How to use these patches
 
-Download [`Tandem/patches.mpp`](Tandem/patches.mpp), import it in Morphe Manager, then select your
-Tandem 6.38.0 APK or APKM and patch. The bundle is the finished artifact — it does not need to be
-built or waited for.
+Add this repository as a Morphe source once and the patches show up inside the app, at the version in
+the release table below:
 
-The Add to Morphe source link below lists patches published through a GitHub Release, and no release
-has been tagged yet, so the checked-in file is how you install for now.
+```
+https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches
+```
+
+Or import a file directly: download either bundle above, open it in Morphe Manager, select your Tandem
+6.38.0 APK or APKM, keep **Bypass PairIP checks** enabled, and patch. Nothing needs to be built
+locally — the `.mpp` in this repo is the finished artifact.
 
 <a href="https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches">
   <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="48">
@@ -125,20 +130,20 @@ has been tagged yet, so the checked-in file is how you install for now.
 Build the bundle locally with `./gradlew :patches:buildAndroid` — the
 `.mpp` file is created at `patches/build/libs/patches-*.mpp`.
 
-<details>
-<summary>Future projects</summary>
-
-Additional applications will receive their own catalog entries when development begins, with patch descriptions, supported versions, release links, and known limitations.
-
-</details>
-
 <br />
 
 <a id="releases"></a>
 
 ## 02 / Releases
 
-Bundles are checked into each app folder — [`Tandem/patches.mpp`](Tandem/patches.mpp) today — and will also be attached to [GitHub Releases](https://github.com/XiONDiGiTaL/MorphePatches/releases) once the first release is tagged, which is what makes the Morphe source link list them.
+| Release | Date | Bundle | Contents |
+| :--- | :--- | :--- | :--- |
+| [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) | 2026-11-01 | [`patches-1.0.0.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.0/patches-1.0.0.mpp) | All four Tandem 6.38.0 patches, first published version |
+
+Releases are automated. Every push to `main` runs semantic-release, which tags the next version,
+attaches the freshly built `.mpp`, regenerates `patches-list.json` and `patches-bundle.json`, and
+rewrites the patch table above. `patches-list.json` is the file the Morphe add-source link reads, so a
+tagged release is what makes these patches appear in the app.
 
 Only patch bundles are distributed here. Original and prepatched proprietary application packages are not.
 
@@ -147,11 +152,11 @@ Only patch bundles are distributed here. Original and prepatched proprietary app
 
 | Status | Meaning |
 | :--- | :--- |
-| Planned | Proposed; not implemented |
-| Research | Feasibility investigation underway |
-| Experimental | Implemented but not fully validated |
-| Tested | Verified with a specified app version and test setup |
-| Released | Available in a published patch bundle |
+| Experimental | Applies cleanly to the stock 6.38.0 APK; not yet confirmed on a device |
+| Tested | Confirmed on a device, with the app version and setup recorded |
+| Released | Included in a published bundle |
+
+All four Tandem patches are **Experimental** in `v1.0.0`.
 
 </details>
 
@@ -163,7 +168,7 @@ Only patch bundles are distributed here. Original and prepatched proprietary app
 
 [Suggest a patch or report an issue ↗](https://github.com/XiONDiGiTaL/MorphePatches/issues)
 
-For future bug reports, include the app version, patch bundle version, selected patches, Android version, and reproduction steps. Remove personal information and credentials from logs. Requests do not guarantee implementation or compatibility.
+When reporting a bug, include the Tandem version, the bundle version (`v1.0.0`), which patches were selected, your Android version, and reproduction steps. Remove personal information and credentials from logs.
 
 <br />
 
@@ -171,8 +176,9 @@ For future bug reports, include the app version, patch bundle version, selected 
 
 #### How do I use this?
 
-Import [`Tandem/patches.mpp`](Tandem/patches.mpp) in Morphe Manager and patch a stock Tandem 6.38.0
-file. Keep **Bypass PairIP checks** enabled — a re-signed build will not start without it.
+Add `XiONDiGiTaL/MorphePatches` as a source in Morphe Manager and it lists all four patches, or import
+[`Tandem/patches.mpp`](Tandem/patches.mpp) directly. Then patch a stock Tandem 6.38.0 file, keeping
+**Bypass PairIP checks** enabled — a re-signed build will not start without it.
 
 #### What APK version should I use?
 

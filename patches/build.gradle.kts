@@ -1,7 +1,6 @@
 group = "app.xiondigital"
 
 patches {
-    // TODO: Update this section with your project details.
     about {
         name = "XiONDiGiTaL Patches"
         description = "Patches for Tandem (net.tandem)"

@@ -3,14 +3,19 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
-The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**. Import that file in Morphe
-Manager and patch a stock Tandem 6.38.0 APK or APKM — nothing else is needed, and no build step is
-required to use it.
+The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.0`
+release asset. Import either file in Morphe Manager and patch a stock Tandem 6.38.0 APK or APKM —
+nothing else is needed, and no build step is required to use it.
+
+Adding `XiONDiGiTaL/MorphePatches` as a source
+(`https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches`) lists the same four patches
+inside Morphe.
 
 | | |
 | :--- | :--- |
-| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes |
-| SHA-256 | `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d` |
+| Release | [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) — `patches-1.0.0.mpp`, 54,103 bytes |
+| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes (same four patches; CI rebuilds the zip at release time) |
+| SHA-256 | `patches.mpp` — `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`<br>release asset — `aa402bfed77657cdc4ee15d30908ddc5c6ac04a4c8e589b74247a7df6a107cd3` |
 | Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
@@ -35,8 +40,9 @@ All four are enabled by default; each can be turned off individually in Morphe M
 | [Remove ads](#remove-ads) | Empties Tandem's community-ad composable and the ad SDKs' load methods | 11 |
 | [Disable Adjust tracking](#disable-adjust-tracking) | Empties `Adjust.initSdk(...)` | 1 |
 
-Nothing in this bundle reads, writes, fakes or re-routes billing, purchase state, sessions or
-entitlement. Every patch is confined to methods that already exist in the APK.
+Every patch is confined to methods that already exist in the APK: nothing is added to the manifest, no
+permission changes, no service is redirected, and the only injected code is the single night-mode call
+in the dark-mode patch.
 
 ---
 
@@ -150,8 +156,8 @@ they are requested only when the user chooses to earn something, so blocking the
 feature rather than an annoyance. SDK initialisation also stays — nothing loads without one of the
 replaced methods, and gutting `init` would break the mediation callbacks Tandem registers.
 
-Ad delivery is decided by the client, which is why this one is patchable while Pro is not (see
-[below](#not-in-the-bundle-pro-and-profile-visitors)).
+Ad delivery is decided on-device — the SDK decides what to request and the slot decides what to draw —
+so replacing the load methods removes the ads without touching anything the server sends.
 
 ---
 
@@ -176,25 +182,10 @@ is unaffected. Tandem's Firebase Analytics usage is a different SDK and is not t
 
 ---
 
-## Not in the bundle: Pro and profile visitors
-
-Pro is server-authoritative in 6.38.0, so there is nothing local to switch. Every Pro value arrives
-inside a server response — `isPro` on `DecodedPayloadAttrs`, `isUserPro` / `visitorsLimit` on
-`ProfileVisitorsProps` and `ViewedProfilesProps`, `isUserPro` on `ChatListProps`, `isPro` on
-`ConversationLimitProps` and on realtime `PresenceStateInternal`. There is no persisted Pro flag: the
-only writer is the `set_pro_status` event the app receives from its own web content.
-
-So a UI-level flip would only make the app *believe* the account is Pro while servers keep answering
-with non-Pro limits and no visitor list — the exact behaviour of the older 6.11.1 "Premium" mod, which
-forced five `isPro` / `isLifetime` getters (and which shipped alongside MT Manager's signature killer;
-6.38.0 additionally has PairIP). Making visitors actually appear would mean rewriting entitlement and
-limit fields in network payloads, i.e. forging the service's own answers. That is not implemented
-here.
-
 ## Install
 
 1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
-2. In Morphe Manager, import [`patches.mpp`](patches.mpp).
+2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
 3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
    without it); enable the other three as wanted.
 4. Patch, then install. The result is signed differently from the store build, so uninstall the stock
@@ -223,7 +214,7 @@ Reference file: APKMirror universal bundle
 | All 14 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
 | Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
-| Ad slot absence, login, messaging, billing | **Not tested** — same reason |
+| Ad slot absence, login, messaging | **Not tested** — same reason |
 
 The last two rows decide whether this bundle is usable; until they are confirmed on a device it stays
 experimental.
@@ -263,16 +254,21 @@ packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or se
 
 ## Changelog
 
-- **Unreleased** — `Remove ads`: community-ad composable (`Ljhp;->a`) plus ten AppLovin MAX / Meta
-  Audience Network load methods reduced to `return-void`; rewarded formats and SDK init left intact.
-  Eleven anchors verified in the stock `base.apk`.
-- **Unreleased** — `Bypass PairIP checks`: `SignatureCheck.verifyIntegrity` and
-  `LicenseClient.checkLicense` reduced to `return-void`; anchors verified in `classes2.dex`.
-- **Unreleased** — `Disable Adjust tracking`: `Adjust.initSdk(AdjustConfig)` reduced to
-  `return-void`; anchor verified in `classes2.dex`.
-- **Unreleased** — `Force dark mode`: `UiModeManager.setApplicationNightMode(2)` injected at
-  `TandemApp.onCreate()`; verified against the real APK.
-- **Unreleased** — first bundle checked in at `patches.mpp` (4 patches, APK + APKM compatibility).
+### 1.0.0 — 2026-11-01
+
+First tagged release: [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
+with `patches-1.0.0.mpp` attached, and `patches-list.json` published so the Morphe source link lists
+all four patches.
+
+- `Remove ads`: community-ad composable (`Ljhp;->a`) plus ten AppLovin MAX / Meta Audience Network load
+  methods reduced to `return-void`; rewarded formats and SDK init left intact. Eleven anchors verified
+  in the stock `base.apk`.
+- `Bypass PairIP checks`: `SignatureCheck.verifyIntegrity` and `LicenseClient.checkLicense` reduced to
+  `return-void`; anchors verified in `classes2.dex`.
+- `Disable Adjust tracking`: `Adjust.initSdk(AdjustConfig)` reduced to `return-void`; anchor verified
+  in `classes2.dex`.
+- `Force dark mode`: `UiModeManager.setApplicationNightMode(2)` injected at `TandemApp.onCreate()`;
+  verified against the real APK.
 
 ## Back to the collection
 

@@ -3,38 +3,51 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
+The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**. Import that file in Morphe
+Manager and patch a stock Tandem 6.38.0 APK or APKM — nothing else is needed, and no build step is
+required to use it.
+
 | | |
 | :--- | :--- |
-| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes, `sha256 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03` |
-| Supported app | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
-| Required patcher | Morphe patcher **2.1.0** (bundles declare `Patcher-Version: 2.1.0`) |
-| Status | **Experimental** — builds, loads and patches 6.38.0; not yet run on a device |
+| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes |
+| SHA-256 | `3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03` |
+| Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
+| Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
+| Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
+| Format | APK and APKM (compatibility entries for both) |
+| Status | **Experimental** — builds, loads, and applies to the real 6.38.0 dex files; not yet run on a device |
 
-Add [`patches.mpp`](patches.mpp) in Morphe Manager (or Desktop) and patch your stock Tandem 6.38.0
-file. Nothing else is distributed here.
+Verify the download before importing:
+
+```bash
+sha256sum patches.mpp
+# 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03
+```
+
+## Patches in the bundle
+
+All four are enabled by default; each can be turned off individually in Morphe Manager.
+
+| Patch | What it changes | Methods touched |
+| :--- | :--- | :--- |
+| [Force dark mode](#force-dark-mode) | Injects an app-level night-mode call at `TandemApp.onCreate()` | 1 (injected) |
+| [Bypass PairIP checks](#bypass-pairip-checks) | Empties PairIP's signature and licence checks | 2 |
+| [Remove ads](#remove-ads) | Empties Tandem's community-ad composable and the ad SDKs' load methods | 11 |
+| [Disable Adjust tracking](#disable-adjust-tracking) | Empties `Adjust.initSdk(...)` | 1 |
+
+Nothing in this bundle reads, writes, fakes or re-routes billing, purchase state, sessions or
+entitlement. Every patch is confined to methods that already exist in the APK.
 
 ---
 
-## Patches
-
 ### Force dark mode
 
-**What it does.** Tandem already contains a dark theme, but the only way in is the system-wide
-dark-mode setting — the app has no appearance setting of its own. This patch turns Tandem's own dark
-theme on for Tandem alone, whatever the system setting is, and leaves other apps and the system
-setting untouched.
+**Effect.** Tandem ships a full dark theme — a `values-night` resource overlay plus a Compose theme
+that respects `uiMode` — but the app has no appearance setting of its own, so the theme is reachable
+only through the system-wide dark-mode switch. This patch turns Tandem's own dark theme on for Tandem
+alone. Other apps and the system setting are untouched.
 
-**Why this is the right lever for this build.** Verified against Tandem 6.38.0:
-
-| Evidence | Where |
-| :--- | :--- |
-| Base theme is a DayNight theme | `BaseAppTheme` → `Theme.Material3.DayNight.NoActionBar` (`res/values/styles.xml`) |
-| A real night overlay ships with the app | `res/values-night/styles.xml` flips `android:isLightTheme` to `false`; `res/values-night/colors.xml` remaps design tokens (`background` → `dark1`, `fontPrimary` → `light1`, …) |
-| Compose follows the same switch | Tandem's Compose theme builds its own `Configuration`, sets `uiMode = (uiMode & ~0x30) \| 0x20` for dark, and applies it through a `ContextThemeWrapper` |
-| The app never forces light or dark itself | no `AppCompatDelegate.setDefaultNightMode(...)` in Tandem's own code |
-| App-level night mode exists on this build | manifest `minSdkVersion` 32; `UiModeManager.setApplicationNightMode` exists from API 31 |
-
-**How.** One platform call is injected at the start of `net.tandem.TandemApp.onCreate()`:
+**Change.** One platform call is prepended to `net.tandem.TandemApp.onCreate()`:
 
 ```smali
 const-string v0, "uimode"
@@ -46,29 +59,31 @@ invoke-virtual {v0, v1}, Landroid/app/UiModeManager;->setApplicationNightMode(I)
 ```
 
 `Application.onCreate()` runs once per process, before the first activity resolves a theme or a
-Compose palette, so every screen starts in Tandem's own night configuration. No theme, colour,
-activity, layout or resource is renamed, replaced or deleted, so media, user images, icons, dialogs
-and system bars keep using Tandem's own night resources. Nothing is force-inverted.
+Compose palette, so every screen starts in Tandem's night configuration. `setApplicationNightMode`
+exists from API 31 and this build is minSdk 32.
 
-**Why `TandemApp`.** The manifest declares `com.pairip.application.Application` (the PairIP wrapper),
-which extends `net.tandem.TandemApp` and only overrides `attachBaseContext` for its integrity and
-licence checks. `onCreate` is inherited unchanged, so the anchor is neither obfuscated nor inside the
-PairIP wrapper, and PairIP is left intact.
+**Anchor.** `net.tandem.TandemApp;->onCreate()V` — inherited unchanged by the PairIP wrapper
+(`com.pairip.application.Application` only overrides `attachBaseContext`), so it is neither
+obfuscated nor displaced by the integrity patch.
+
+**Not touched.** No theme, colour, activity, layout or resource is renamed or replaced, so user
+images, media, icons, dialogs and system bars keep using Tandem's own night resources. Nothing is
+force-inverted.
 
 ---
 
 ### Bypass PairIP checks
 
-**What it does.** Lets a patched, re-signed Tandem build start at all. Tandem 6.38.0 is protected
-with PairIP: the manifest declares `com.pairip.application.Application` as the app class, and its
-`attachBaseContext` runs two checks before Tandem initialises:
+**Effect.** Lets a patched, re-signed build start at all. 6.38.0 is protected with PairIP: the
+manifest declares `com.pairip.application.Application`, whose `attachBaseContext` runs two gates
+before Tandem initialises.
 
-| Check | What it does | Why it stops a patched build |
+| Gate | What it does | Why a patched build trips it |
 | :--- | :--- | :--- |
-| `SignatureCheck.verifyIntegrity(context)` | Base64-SHA-256 of the installed APK's signing certificate, compared against the expected values | Any re-signed APK mismatches and it throws `SignatureTamperedException("Apk signature is invalid.")` before the first activity |
-| `LicenseClient.checkLicense(context)` | Binds Google Play's licensing service via `LicenseActivity` | A sideloaded build cannot satisfy the licence response |
+| `SignatureCheck.verifyIntegrity(context)` | Base64 SHA-256 of the APK signing certificate, compared to expected values | Any re-signed APK mismatches and throws `SignatureTamperedException("Apk signature is invalid.")` before the first activity |
+| `LicenseClient.checkLicense(context)` | Binds Play's licensing service via `LicenseActivity` | A sideloaded build cannot satisfy the licence response |
 
-**How.** Both method bodies become a single `return-void`:
+**Change.** Both bodies become a single instruction:
 
 ```smali
 .method public static verifyIntegrity(Landroid/content/Context;)V
@@ -76,55 +91,41 @@ with PairIP: the manifest declares `com.pairip.application.Application` as the a
 .end method
 ```
 
-Both are pure checks: they return `void`, keep no state that other code reads, and no other class in
-the APK calls them for a result. PairIP's method-level protection (`VMRunner`, `StartupLauncher`) is
-left untouched, so the classes it decrypts at runtime still load normally.
+Both are pure checks: `void` returns, no state other code reads, no other class calls them for a
+result.
 
-**Verified anchors** (stock 6.38.0 `base.apk`, `classes2.dex`):
+**Anchors** (stock 6.38.0 `base.apk`, `classes2.dex`):
 
 ```smali
 Lcom/pairip/SignatureCheck;->verifyIntegrity(Landroid/content/Context;)V          # public static
 Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V # public static
 ```
 
-**Note.** This patch is enabled by default because nothing else can run without it: the re-sign that
-any patcher performs is exactly what the signature check rejects.
+**Not touched.** PairIP's method-level protection (`VMRunner`, `StartupLauncher`) stays active, so the
+classes it decrypts at runtime still load.
 
-### Disable Adjust tracking
+This patch is on by default because nothing else can run without it: the re-sign every patcher
+performs is exactly what the signature check rejects.
 
-**What it does.** Stops Tandem's bundled Adjust attribution SDK (246 classes) from initialising, so no
-install, session, event or deep-link attribution is sent.
-
-Tandem starts Adjust from one call site, with the app token `w9jqbcact05c`, and then calls
-`Adjust.enable()` and `Adjust.onResume()`. Only `initSdk` creates and binds the session, so its body
-becomes `return-void`.
-
-**Verified anchor** (stock 6.38.0 `base.apk`, `classes2.dex`):
-
-```smali
-Lcom/adjust/sdk/Adjust;->initSdk(Lcom/adjust/sdk/AdjustConfig;)V # public static
-```
-
-The two follow-up calls are deliberately left in place: `AdjustInstance.enable()` guards itself with
-`checkActivityHandler(...)`, which logs and returns when no session was created, so they are already
-no-ops once `initSdk` is skipped. Tandem's deep-link handler is registered separately on the
-application object and is unaffected. The app's Firebase Analytics helper is a different SDK and is
-not touched by this patch.
+---
 
 ### Remove ads
 
-**What it does.** Removes Tandem's community ad slot and stops the two bundled ad SDKs from
-requesting ads, so no app-open, banner, interstitial or native ad is delivered.
+**Effect.** Removes Tandem's community ad slot and stops both bundled ad SDKs from requesting ads, so
+no app-open, banner, interstitial or native ad is delivered or rendered.
 
-**Where the ads actually come from.** Two independent paths, both covered:
+**Change.** Three paths, eleven methods, each reduced to `return-void`:
 
-| Path | Anchor in 6.38.0 | How it is removed |
+| Path | Anchors in 6.38.0 | Result |
 | :--- | :--- | :--- |
-| Tandem's community ad slot | `Ljhp;->a(Lex4;Lf79;Lpw4;Leh;Lbg5;I)V`, the one composable that consumes `CommunityAdConfig(adUnitId, adSize)` with unit `ca-app-pub-4507927355231659/3667237836` | Body becomes `return-void`, so the slot emits nothing — exactly the branch the screen already takes when the config is `null` |
-| AppLovin MAX | `MaxAppOpenAd.loadAd()`, `MaxInterstitialAd.loadAd()`, `MaxAdView.loadAd()`, `MaxAdView.startAutoRefresh()` | Bodies become `return-void`, so no request is made and `isReady()` stays false |
-| Meta Audience Network | `InterstitialAd.loadAd()` + `loadAd(InterstitialLoadAdConfig)`, `AdView.loadAd()` + `loadAd(AdViewLoadConfig)`, `NativeAdBase.loadAd()` + `loadAd(NativeLoadAdConfig)` | Same, for both call styles |
+| Tandem's community ad slot | `Ljhp;->a(Lex4;Lf79;Lpw4;Leh;Lbg5;I)V` — the one composable consuming `CommunityAdConfig(adUnitId, adSize)` for unit `ca-app-pub-4507927355231659/3667237836` | The slot emits nothing, which is the `config == null` branch the screen already handles; no ad view is created |
+| AppLovin MAX | `MaxAppOpenAd.loadAd()`, `MaxInterstitialAd.loadAd()`, `MaxAdView.loadAd()`, `MaxAdView.startAutoRefresh()` | No request is made; `isReady()` stays false; banner refresh never arms |
+| Meta Audience Network | `InterstitialAd.loadAd()` and `loadAd(InterstitialLoadAdConfig)`, `AdView.loadAd()` and `loadAd(AdViewLoadConfig)`, `NativeAdBase.loadAd()` and `loadAd(NativeLoadAdConfig)` | Same, for both call styles |
 
-**Verified anchors** (stock 6.38.0 `base.apk`):
+Both the no-argument and the `…LoadAdConfig` overloads are replaced because either call style reaches
+the SDK.
+
+**Anchors** (stock 6.38.0 `base.apk`, `classes.dex` / `classes4.dex`):
 
 ```smali
 Ljhp;->a(Lex4;Lf79;Lpw4;Leh;Lbg5;I)V                                      # public static
@@ -140,164 +141,74 @@ Lcom/facebook/ads/NativeAdBase;->loadAd()V                                # publ
 Lcom/facebook/ads/NativeAdBase;->loadAd(Lcom/facebook/ads/NativeAdBase$NativeLoadAdConfig;)V
 ```
 
-R8 relocates Tandem's own classes into the default package — jadx writes those under
-`defpackage/` — which is why the community-ad composable's descriptor is the one-letter `Ljhp;`,
-while the SDK classes keep their package names because their consumer rules preserve the API
-surface.
+R8 relocated Tandem's own classes into the default package (jadx shows them under `defpackage/`),
+which is why the community composable's descriptor is the one-letter `Ljhp;`; the SDK classes keep
+their package names because their consumer rules preserve the public API surface.
 
-**What is deliberately left alone.** Rewarded formats (`MaxRewardedAd`, `RewardedVideoAd`,
-`RewardedInterstitialAd`) are untouched: they are only requested when the user asks for one, so
-blocking them would remove a feature instead of an annoyance. The SDKs' own `init` calls are
-untouched too — nothing loads without one of the replaced methods, and gutting initialisation would
-break the mediation callbacks Tandem has registered. Nothing here reads or writes billing, purchase
-state or entitlement.
+**Not touched.** Rewarded formats (`MaxRewardedAd`, `RewardedVideoAd`, `RewardedInterstitialAd`) stay:
+they are requested only when the user chooses to earn something, so blocking them would remove a
+feature rather than an annoyance. SDK initialisation also stays — nothing loads without one of the
+replaced methods, and gutting `init` would break the mediation callbacks Tandem registers.
 
----
-
-## Tandem Pro: what is client-side and what is not
-
-This was investigated properly for 6.38.0, because "unlock Pro locally" is only possible if the
-client decides it. It does not.
-
-Every Pro-dependent value in this build arrives **inside a server response**, not from local state:
-
-| Server-delivered model | Field |
-| :--- | :--- |
-| `net.tandem.kmp.sdk.core.remote.DecodedPayloadAttrs` | `net.tandem.core.users.attributes.isPro` |
-| `ProfileVisitorsProps` | `isUserPro`, `visitorsLimit` |
-| `ViewedProfilesProps` | `isUserPro` |
-| `ChatListProps` / `ChatListEntity` | `isUserPro` |
-| `ConversationLimitProps` | `isPro` |
-| `PresenceStateInternal` (realtime) | `isPro` |
-| `Success(visitors=…, isUserPro=…)` (profile-visitors endpoint result) | `isUserPro` |
-
-There is **no locally persisted Pro flag** to switch: a search of the app's storage and preference
-keys finds none, and the only "pro status" writer in the client is the JS bridge event
-`set_pro_status`, which the app receives from its own web content. Profile visitors are not a hidden
-client list either — they are returned by a profile-visitors endpoint that itself answers with
-`isUserPro` and `visitorsLimit`.
-
-Consequences, stated plainly:
-
-- **Nothing client-side can be "enabled" for Pro.** Flipping a UI boolean would leave the app asking
-  servers that still answer "not Pro", still send no visitor list, and still report limits reached.
-- **Making visitors appear would mean forging the server's answer** — rewriting entitlement and
-  limit fields in network payloads. That is tampering with the service's entitlement decisions, not
-  a client-side behaviour change, so it is not implemented here. It is also the one thing that would
-  reliably break Tandem's own consistency checks (PairIP is active and untouched).
-- **Billing, authentication and entitlement handling are untouched.** No patch here reads, writes,
-  fakes or re-routes Google Play Billing, purchase state, JWT/session data or entitlement.
-
-So: Pro features, profile visitors included, are **not implemented — technically blocked by
-server-side entitlement**, not by preference.
-
-### How a working 6.11.1 "Premium" mod did it
-
-A Tandem 6.11.1 build distributed as "Premium (Mod by ElaMods)" (`sha256
-3b387e5f65c1a1ac3f0c2916183348c2273262cb2bc96c200922dd914cfe5d19`, 255 MB) was decompiled for
-comparison. It contains exactly two kinds of change, and neither touches the server:
-
-1. **MT Manager's ApkSignatureKiller.** An injected 17 KB `classes6.dex` holding
-   `bin/mt/signature/KillerApplication`, plus `assets/SignatureKiller/origin.apk` and a native
-   `libsigner.so`. It makes the re-signed APK report the original app signature. (6.11.1 has no
-   PairIP; the 6.38.0 build discussed above does.)
-2. **Five getters forced to `return true`**, each still reading its field first — the signature of a
-   hand edit that swaps the return register for `const/4 v0, 0x1`:
-
-   | Class | Method | Field |
-   | :--- | :--- | :--- |
-   | `net.tandem.core_new.models.MyProfile` | `isPro()` | `isPro` |
-   | `net.tandem.core_new.models.UserProfile` | `isPro()` | `isPro` |
-   | `net.tandem.kmp.sdk.presence.states.PresenceStateInternal` | `isPro()` | `isPro` |
-   | `net.tandem.parties.core.models.LocalMember` | `isPro()` | `isPro` |
-   | `net.tandem.pro_core.models.Product` | `isLifetime()` | `isLifetime` |
-
-What it deliberately leaves alone matters just as much: `MyProfileMetaData.isPro()`
-(language-change limits), `Visitor.isPro()`, `ConversationLimitProps.isPro()`,
-`NewRoomState.isProUser()` and `MyLanguagesState.isPro()` still return the server's value.
-
-The effect is that the app *believes* the account is Pro — Pro badge, Pro-only UI such as the city
-filter, purchase/deeplink screens — while every quota and every server-answered question still comes
-back as non-Pro. That is the entire technique, and it is exactly why such a mod cannot deliver
-profile visitors: the visitor list is a server response, not a local flag.
-
-## Ads
-
-Ad handling is **implemented** — see [Remove ads](#remove-ads). What the 6.38.0 bundle showed:
-
-- The client bundles **AdMob** (app id under `ca-app-pub-…`), **AppLovin MAX** (`com.applovin`, with
-  its mediation debugger activities) and **Meta Audience Network** (`assets/audience_network/*.dex`).
-- The community ad slot is Tandem's own Compose slot: the view model emits
-  `CommunityAdConfig("ca-app-pub-4507927355231659/3667237836", MEDIUM_RECTANGLE)` and a single
-  composable renders it. AdMob's own view classes are not in the dex, so the slot — not an SDK call —
-  is the choke point for that placement.
-- Ads are tied to the Pro upsell: the app's own copy reads *"Remove ads and enjoy Language Parties
-  completely distraction-free."* That is why dropping the ad *requests* is treated differently from
-  the Pro flags above: it is a client-side behaviour change that sends fewer requests to third
-  parties, not a forged entitlement or a rewritten server answer.
+Ad delivery is decided by the client, which is why this one is patchable while Pro is not (see
+[below](#not-in-the-bundle-pro-and-profile-visitors)).
 
 ---
 
-## Supported versions
+### Disable Adjust tracking
 
-| Version | Version code | File type | Status |
-| :--- | :--- | :--- | :--- |
-| 6.38.0 | 11568 | APKM bundle (base + ABI/density splits) | Inspected, patched, **not device-tested** |
-| 6.38.0 | 11568 | Single APK (`base.apk`, or a universal build of the same version) | Same patch, **not device-tested** |
+**Effect.** Stops Tandem's bundled Adjust attribution SDK (246 classes) from initialising, so no
+install, session, event or deep-link attribution is sent.
 
-Reference file: APKMirror universal bundle `sha256 17539cc675654353e5971a8fd2bea6384876c71f63b387f8d95ef6cf7502e3ca`
-(`base.apk` `sha256 940797a624210ba555fc0e67e9b7ce9456c4dd811450d4e973ac716ee721942b`). Package
-metadata: `net.tandem`, versionName `6.38.0`, versionCode `11568`, minSdk 32, targetSdk 37,
-compileSdk 37.
+**Change.** `Adjust.initSdk(AdjustConfig)` becomes `return-void`. Tandem calls it once with app token
+`w9jqbcact05c`, then calls `Adjust.enable()` and `Adjust.onResume()`.
 
-No other version is claimed. The compatibility declaration lists only 6.38.0, so Morphe refuses to
-apply the bundle to another version instead of silently patching it. Adding a version is a claim that
-the fingerprint and injected code were verified against that exact build.
+**Anchor** (stock 6.38.0 `base.apk`, `classes2.dex`):
 
-## Build
-
-```bash
-# JDK 21, from the repository root
-./gradlew :patches:buildAndroid
-# -> patches/build/libs/patches-*.mpp   (copy over Tandem/patches.mpp when it changes)
+```smali
+Lcom/adjust/sdk/Adjust;->initSdk(Lcom/adjust/sdk/AdjustConfig;)V # public static
 ```
 
-The Morphe Gradle plugin is published only to GitHub Packages, which needs credentials even for
-public packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or set
-`gpr.user` / `gpr.key` in `~/.gradle/gradle.properties`.
+**Not touched.** The two follow-up calls are left in place deliberately: `AdjustInstance.enable()`
+guards itself with `checkActivityHandler(...)`, which logs and returns when no session exists, so they
+are already no-ops. Tandem's deep-link handler is registered separately on the application object and
+is unaffected. Tandem's Firebase Analytics usage is a different SDK and is not touched by this patch.
 
-`./gradlew :patches:generatePatchesList` regenerates `patches-list.json` from the built bundle;
-releases do this automatically via semantic release on `main`/`dev`.
+---
+
+## Not in the bundle: Pro and profile visitors
+
+Pro is server-authoritative in 6.38.0, so there is nothing local to switch. Every Pro value arrives
+inside a server response — `isPro` on `DecodedPayloadAttrs`, `isUserPro` / `visitorsLimit` on
+`ProfileVisitorsProps` and `ViewedProfilesProps`, `isUserPro` on `ChatListProps`, `isPro` on
+`ConversationLimitProps` and on realtime `PresenceStateInternal`. There is no persisted Pro flag: the
+only writer is the `set_pro_status` event the app receives from its own web content.
+
+So a UI-level flip would only make the app *believe* the account is Pro while servers keep answering
+with non-Pro limits and no visitor list — the exact behaviour of the older 6.11.1 "Premium" mod, which
+forced five `isPro` / `isLifetime` getters (and which shipped alongside MT Manager's signature killer;
+6.38.0 additionally has PairIP). Making visitors actually appear would mean rewriting entitlement and
+limit fields in network payloads, i.e. forging the service's own answers. That is not implemented
+here.
 
 ## Install
 
-1. Use Tandem **6.38.0** (versionCode 11568).
-2. In Morphe Manager, import [`patches.mpp`](patches.mpp) (or the bundle you just built).
-3. Select your Tandem file, keep **Bypass PairIP checks** enabled (without it a re-signed
-   build does not start), enable **Force dark mode**, **Remove ads** and **Disable Adjust tracking**
-   as wanted, then patch and install.
-4. The patched build is signed differently from the store build, so remove the stock app first and
-   keep your login details handy.
+1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
+2. In Morphe Manager, import [`patches.mpp`](patches.mpp).
+3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
+   without it); enable the other three as wanted.
+4. Patch, then install. The result is signed differently from the store build, so uninstall the stock
+   app first and have your login details ready.
 
-## Requested features and what the APK can support
+## Compatibility
 
-The full feature list proposed for this patch (media tools, study workflow, speech tools, Pro
-targets) is triaged feature by feature against the 6.38.0 code in [ROADMAP.md](ROADMAP.md): what a
-dex patch can deliver, what needs new app code, and what is server-authoritative.
+Only 6.38.0 is declared, so Morphe refuses the bundle on any other version instead of silently
+patching it. Adding a version is a claim that the fingerprints and the injected code were verified
+against that exact build.
 
-## Known limitations
-
-- **Not device-tested.** The bundle compiles, loads through Morphe's loader, and applies to the real
-  6.38.0 dex files, but nobody has looked at the result on a screen yet.
-- **No in-app toggle.** The patch is on/off at patch time; a toggle would need a real settings
-  destination and a persisted preference in Tandem's own settings architecture.
-- **Only night-aware UI changes.** Screens, WebViews or ad creatives that ignore `uiMode` look the
-  same as they do today with system dark mode on.
-- **Rewarded ads stay.** Formats the user explicitly opens to earn something are not blocked, by
-  design; only the unrequested placements and the community ad slot are removed.
-- **Single known-good version**, by design.
-- **PairIP stays on.** A patched build may still be refused by Tandem's integrity checks; that risk
-  is inherent to patching this app and is not worked around.
+Reference file: APKMirror universal bundle
+`sha256 17539cc675654353e5971a8fd2bea6384876c71f63b387f8d95ef6cf7502e3ca` (`base.apk`
+`sha256 940797a624210ba555fc0e67e9b7ce9456c4dd811450d4e973ac716ee721942b`).
 
 ## Testing status
 
@@ -308,50 +219,60 @@ dex patch can deliver, what needs new app code, and what is server-authoritative
 | Bundle loads via Morphe's `loadPatchesFromJar` | Pass |
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
 | Patch applies to the real 6.38.0 `base.apk` (fingerprint match + dex assembly) | Pass |
-| Injected call present in the compiled patched dex | Pass — the patched dex decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()`, before `super.onCreate()` |
-| Ad anchors present in the stock dex | Pass — the community-ad composable and all ten SDK load methods match in `classes.dex`/`classes4.dex` of the reference `base.apk` |
+| Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
+| All 14 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
-| Dark mode correct on major screens, dialogs, navigation | **Not tested** — no device or emulator available |
-| Login, messaging, language exchange, settings, billing unaffected | **Not tested** — same reason |
+| Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
+| Ad slot absence, login, messaging, billing | **Not tested** — same reason |
 
-The last two rows decide whether this is usable; until they are confirmed on a device the patch stays
+The last two rows decide whether this bundle is usable; until they are confirmed on a device it stays
 experimental.
 
-## Compatibility warnings
+## Known limitations
+
+- **Not device-tested.** Everything above is checks against the APK's own dex and resources, not
+  screen behaviour.
+- **No in-app toggle.** Each patch is on or off at patch time; a runtime switch would need a settings
+  destination and a persisted preference inside Tandem's settings architecture.
+- **Only night-aware UI changes.** Screens, WebViews or creatives that ignore `uiMode` look the same as
+  they do with the system dark mode on.
+- **Rewarded ads stay** — by design, as described above.
+- **PairIP risk remains.** The checks that are bypassed are the two that break re-signed builds; a
+  future server-side integrity signal could still refuse a patched client.
+
+## Warnings
 
 - Do not apply to any Tandem build other than 6.38.0, and do not force a version mismatch.
 - Do not combine with another Tandem patch that injects at `Application.onCreate()`.
-- Signing the patched result changes the signature; store updates will not apply over it.
+- Store updates will not install over the patched, differently-signed build.
 
-## A note on the older ELAmods Tandem patch
+## Building the bundle
 
-The older ELAmods Tandem patch was treated as historical reference only and **no code from it was
-copied**. A 6.11.1 build carrying that name was decompiled in November 2026 and is analysed in
-[How a working 6.11.1 "Premium" mod did it](#how-a-working-6111-premium-mod-did-it); it is a
-different app version and none of its code, smali or technique is used here. This repository's history contains no ELAmods source for Tandem: the folder previously held
-one scaffold (`Tandem/dark-mode/DarkModePatch.kt`, an empty `execute` block with a `TODO` fingerprint)
-and a placeholder file. The fingerprints, injected code and compatibility declaration here were
-derived from inspecting Tandem 6.38.0 itself. The scaffold's idea — a bytecode patch that turns the
-theme dark — is kept; its structure is not relied on.
+```bash
+# JDK 21, from the repository root
+./gradlew :patches:buildAndroid
+# -> patches/build/libs/patches-*.mpp   (copy over Tandem/patches.mpp when it changes)
+```
+
+Patch sources live in `patches/src/main/kotlin/app/xiondigital/patches/tandem/` — one package per
+patch plus `shared/Constants.kt` for the compatibility declarations.
+
+The Morphe Gradle plugin is published only to GitHub Packages, which needs credentials even for public
+packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or set `gpr.user` /
+`gpr.key` in `~/.gradle/gradle.properties`.
 
 ## Changelog
 
-- **Unreleased** — `Remove ads`: Tandem's community-ad composable (`Ljhp;->a`) reduced to
-  `return-void`, and the AppLovin MAX and Meta Audience Network load methods likewise, so no ad is
-  requested or rendered. All eleven anchors verified in the stock `base.apk` (`classes.dex`,
-  `classes4.dex`). Rewarded formats and SDK initialisation left intact.
+- **Unreleased** — `Remove ads`: community-ad composable (`Ljhp;->a`) plus ten AppLovin MAX / Meta
+  Audience Network load methods reduced to `return-void`; rewarded formats and SDK init left intact.
+  Eleven anchors verified in the stock `base.apk`.
 - **Unreleased** — `Bypass PairIP checks`: `SignatureCheck.verifyIntegrity` and
-  `LicenseClient.checkLicense` bodies replaced with `return-void`, so a re-signed 6.38.0 build
-  starts. Both anchors verified in the stock `base.apk` (`classes2.dex`). Not yet run on a device.
-- **Unreleased** — `Disable Adjust tracking`: `Adjust.initSdk(AdjustConfig)` body replaced with
-  `return-void`. Anchor verified in the stock `base.apk` (`classes2.dex`).
-- **Unreleased** — `Force dark mode` for Tandem 6.38.0 (APKM and APK) is working and verified against
-  the real APK; the empty scaffold is gone. Shared compatibility declarations and the
-  `TandemApp.onCreate` fingerprint added. Pro, profile visitors and ads investigated and documented
-  above: server-side entitlement, so not implemented. Prebuilt bundle checked in at `patches.mpp`.
-- **Unreleased** — ELAmods' 6.11.1 "Premium" build decompiled for comparison: its unlock is five
-  forced `isPro` / `isLifetime` getters (signature-killed APK, no PairIP at that version), leaving all
-  server-side limits intact. Recorded above; no code borrowed from it.
+  `LicenseClient.checkLicense` reduced to `return-void`; anchors verified in `classes2.dex`.
+- **Unreleased** — `Disable Adjust tracking`: `Adjust.initSdk(AdjustConfig)` reduced to
+  `return-void`; anchor verified in `classes2.dex`.
+- **Unreleased** — `Force dark mode`: `UiModeManager.setApplicationNightMode(2)` injected at
+  `TandemApp.onCreate()`; verified against the real APK.
+- **Unreleased** — first bundle checked in at `patches.mpp` (4 patches, APK + APKM compatibility).
 
 ## Back to the collection
 

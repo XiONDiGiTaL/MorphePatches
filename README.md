@@ -63,13 +63,24 @@ No app versions verified yet.
 
 | App | Package | Patches |
 | --- | --- | --- |
-| [Tandem](Tandem/) | `net.tandem` | Dark mode (Planned)<br>Remove ads (Planned)<br>Local Pro-related controls (Research planned)<br>Profile visitor display (Feasibility unverified) |
+| [Tandem](Tandem/) | `net.tandem` | [Force dark mode](Tandem/README.md#force-dark-mode) — 6.38.0 only |
 
-Supported versions: none verified.
+Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 28,538 bytes,
+`sha256 fd58ab8ddf5b2ef83ff438be287306bd882193489486dc52ff274764c4883749`. Import it in Morphe
+Manager, or patch your stock Tandem 6.38.0 file with it directly.
 
-Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) — dark-mode work in progress only; no bundle to install yet.
+Supported versions: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK. The bundle builds
+and applies to that exact build; it has not been run on a device yet.
 
-> These are investigation targets, not available patches. A dark-mode scaffold exists in Tandem/, but its theme fingerprint is still TBD — the APK has not been inspected for it, and no patch has been tested as working. Server-managed features may not be accessible through local changes.
+Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) —
+`Force dark mode` is implemented for 6.38.0 only, and the prebuilt bundle is checked in next to its
+docs.
+
+> Tandem Pro features (profile visitors included) and ad removal are not implemented. Both are decided
+> by Tandem's servers rather than by a client switch: entitlement and limits arrive per response as
+> `isUserPro` / `visitorsLimit` / `isPro` fields, with no local Pro flag to enable. Doing it anyway
+> would mean forging entitlement payloads, which this collection does not do. The evidence and the
+> full client/server breakdown are in [Tandem/README.md](Tandem/README.md).
 
 ### Generated patch list
 

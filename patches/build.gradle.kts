@@ -4,7 +4,7 @@ patches {
     // TODO: Update this section with your project details.
     about {
         name = "XiONDiGiTaL Patches"
-        description = "Patches for Tandem (dark mode, work in progress)"
+        description = "Patches for Tandem (net.tandem)"
         source = "git@github.com:XiONDiGiTaL/MorphePatches.git"
         author = "XiONDiGiTaL"
         contact = "https://xiondigital.net"

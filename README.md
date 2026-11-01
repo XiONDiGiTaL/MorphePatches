@@ -1,4 +1,9 @@
-<!-- Styling based on xiondigital.net (assets/css/xion.css):
+<!-- docs/ holds the GitHub Pages site: a dark editorial page in the same design
+     system as xiondigital.net (assets/css/xion.css), with the patch collection as
+     its only subject. Edit docs/index.html and docs/style.css; the logo lives at
+     docs/assets/xion-morphe-patches.png and is used here and in the site header.
+
+     Styling based on xiondigital.net (assets/css/xion.css):
      Dark editorial palette: bg #050607, panel #0c0e11 / #101318,
      ink #ecedef, body #bdc3cc, muted #8b9099,
      accent blue #3f80ff, blue-hi #79a8ff.
@@ -11,18 +16,18 @@
 
 `MORPHE PATCHES — XIONDIGITAL`
 
-# XiØN Patches
+<img src="docs/assets/xion-morphe-patches.png" alt="XiØN Morphe Patches" width="440">
 
 *Independent Android patches and adaptations for [Morphe](https://morphe.software).*
 
 [![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
 [![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
-[![Website](https://img.shields.io/badge/Website-xiondigital.net-0c0e11?style=flat-square)](https://xiondigital.net)
+[![Site](https://img.shields.io/badge/Site-xion%20patches-0c0e11?style=flat-square)](https://xiondigital.github.io/MorphePatches/)
 
 <a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
 <a href="#releases">02 / Releases</a> &nbsp; / &nbsp;
 <a href="#requests-and-issues">03 / Requests</a> &nbsp; / &nbsp;
-<a href="https://xiondigital.net">Website ↗</a>
+<a href="https://xiondigital.github.io/MorphePatches/">Site ↗</a>
 
 </div>
 
@@ -213,8 +218,8 @@ This project is intended to share independent modifications, not redistribute pr
 
 ---
 
-<a href="https://xiondigital.net">XiØN · XiONDiGiTaL ↗</a>
+<a href="https://xiondigital.github.io/MorphePatches/">XiØN · Morphe Patches ↗</a>
 
-<sub>Independent patch collection — xiondigital.net</sub>
+<sub>Independent patch collection — <a href="https://xiondigital.net">XiONDiGiTaL</a></sub>
 
 </div>

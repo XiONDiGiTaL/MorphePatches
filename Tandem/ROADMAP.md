@@ -103,7 +103,9 @@ Only items where the change lives inside a method that already exists:
 
 | Patch | Status | Notes |
 | :--- | :--- | :--- |
+| Bypass PairIP checks | **Shipped** | `SignatureCheck.verifyIntegrity` and `LicenseClient.checkLicense` reduced to `return-void`; required for any re-signed build to start |
 | Force dark mode | **Shipped** | `UiModeManager.setApplicationNightMode(2)` at `TandemApp.onCreate()` |
+| Disable Adjust tracking | **Shipped** | `Adjust.initSdk(AdjustConfig)` reduced to `return-void`; 246-class attribution SDK never initialises |
 | Default voice-note playback speed | Candidate | Requires tracing the obfuscated player; a fixed speed, not a menu |
 | Ad path suppression | Documented, not shipped | See above |
 

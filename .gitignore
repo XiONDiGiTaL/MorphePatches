@@ -132,3 +132,6 @@ node_modules/
 # Ignore IDEA files
 .idea/
 local.properties
+
+# Local build workaround (mavenLocal init script)
+.work/

@@ -63,17 +63,17 @@ No app versions verified yet.
 
 | App | Package | Patches |
 | --- | --- | --- |
-| [Tandem](Tandem/) | `net.tandem` | [Force dark mode](Tandem/README.md#force-dark-mode) — 6.38.0 only |
+| [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
 
-Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 28,538 bytes,
-`sha256 fd58ab8ddf5b2ef83ff438be287306bd882193489486dc52ff274764c4883749`. Import it in Morphe
+Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 38,109 bytes,
+`sha256 0d0f332ca620f64816adc6c034852929ddd8bc59525c3b50abde7707e565bb2f`. Import it in Morphe
 Manager, or patch your stock Tandem 6.38.0 file with it directly.
 
 Supported versions: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK. The bundle builds
 and applies to that exact build; it has not been run on a device yet.
 
 Tandem patch source: [Tandem/ ↗](https://github.com/XiONDiGiTaL/MorphePatches/tree/main/Tandem) —
-`Force dark mode` is implemented for 6.38.0 only, and the prebuilt bundle is checked in next to its
+`Bypass PairIP checks`, `Force dark mode` and `Disable Adjust tracking` are implemented for 6.38.0 only, and the prebuilt bundle is checked in next to its
 docs.
 
 > Tandem Pro features (profile visitors included) and ad removal are not implemented. Both are decided

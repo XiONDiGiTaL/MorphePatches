@@ -5,7 +5,7 @@ Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built f
 
 | | |
 | :--- | :--- |
-| Bundle | [`patches.mpp`](patches.mpp) — 28,538 bytes, `sha256 fd58ab8ddf5b2ef83ff438be287306bd882193489486dc52ff274764c4883749` |
+| Bundle | [`patches.mpp`](patches.mpp) — 38,109 bytes, `sha256 0d0f332ca620f64816adc6c034852929ddd8bc59525c3b50abde7707e565bb2f` |
 | Supported app | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Required patcher | Morphe patcher **2.1.0** (bundles declare `Patcher-Version: 2.1.0`) |
 | Status | **Experimental** — builds, loads and patches 6.38.0; not yet run on a device |
@@ -54,6 +54,62 @@ and system bars keep using Tandem's own night resources. Nothing is force-invert
 which extends `net.tandem.TandemApp` and only overrides `attachBaseContext` for its integrity and
 licence checks. `onCreate` is inherited unchanged, so the anchor is neither obfuscated nor inside the
 PairIP wrapper, and PairIP is left intact.
+
+---
+
+### Bypass PairIP checks
+
+**What it does.** Lets a patched, re-signed Tandem build start at all. Tandem 6.38.0 is protected
+with PairIP: the manifest declares `com.pairip.application.Application` as the app class, and its
+`attachBaseContext` runs two checks before Tandem initialises:
+
+| Check | What it does | Why it stops a patched build |
+| :--- | :--- | :--- |
+| `SignatureCheck.verifyIntegrity(context)` | Base64-SHA-256 of the installed APK's signing certificate, compared against the expected values | Any re-signed APK mismatches and it throws `SignatureTamperedException("Apk signature is invalid.")` before the first activity |
+| `LicenseClient.checkLicense(context)` | Binds Google Play's licensing service via `LicenseActivity` | A sideloaded build cannot satisfy the licence response |
+
+**How.** Both method bodies become a single `return-void`:
+
+```smali
+.method public static verifyIntegrity(Landroid/content/Context;)V
+    return-void
+.end method
+```
+
+Both are pure checks: they return `void`, keep no state that other code reads, and no other class in
+the APK calls them for a result. PairIP's method-level protection (`VMRunner`, `StartupLauncher`) is
+left untouched, so the classes it decrypts at runtime still load normally.
+
+**Verified anchors** (stock 6.38.0 `base.apk`, `classes2.dex`):
+
+```smali
+Lcom/pairip/SignatureCheck;->verifyIntegrity(Landroid/content/Context;)V          # public static
+Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V # public static
+```
+
+**Note.** This patch is enabled by default because nothing else can run without it: the re-sign that
+any patcher performs is exactly what the signature check rejects.
+
+### Disable Adjust tracking
+
+**What it does.** Stops Tandem's bundled Adjust attribution SDK (246 classes) from initialising, so no
+install, session, event or deep-link attribution is sent.
+
+Tandem starts Adjust from one call site, with the app token `w9jqbcact05c`, and then calls
+`Adjust.enable()` and `Adjust.onResume()`. Only `initSdk` creates and binds the session, so its body
+becomes `return-void`.
+
+**Verified anchor** (stock 6.38.0 `base.apk`, `classes2.dex`):
+
+```smali
+Lcom/adjust/sdk/Adjust;->initSdk(Lcom/adjust/sdk/AdjustConfig;)V # public static
+```
+
+The two follow-up calls are deliberately left in place: `AdjustInstance.enable()` guards itself with
+`checkActivityHandler(...)`, which logs and returns when no session was created, so they are already
+no-ops once `initSdk` is skipped. Tandem's deep-link handler is registered separately on the
+application object and is unaffected. The app's Firebase Analytics helper is a different SDK and is
+not touched by this patch.
 
 ---
 
@@ -177,7 +233,9 @@ releases do this automatically via semantic release on `main`/`dev`.
 
 1. Use Tandem **6.38.0** (versionCode 11568).
 2. In Morphe Manager, import [`patches.mpp`](patches.mpp) (or the bundle you just built).
-3. Select your Tandem file, enable **Force dark mode**, patch, install.
+3. Select your Tandem file, keep **Bypass PairIP checks** enabled (without it a re-signed
+   build does not start), enable **Force dark mode** and **Disable Adjust tracking** as wanted,
+   then patch and install.
 4. The patched build is signed differently from the store build, so remove the stock app first and
    keep your login details handy.
 
@@ -235,6 +293,11 @@ theme dark — is kept; its structure is not relied on.
 
 ## Changelog
 
+- **Unreleased** — `Bypass PairIP checks`: `SignatureCheck.verifyIntegrity` and
+  `LicenseClient.checkLicense` bodies replaced with `return-void`, so a re-signed 6.38.0 build
+  starts. Both anchors verified in the stock `base.apk` (`classes2.dex`). Not yet run on a device.
+- **Unreleased** — `Disable Adjust tracking`: `Adjust.initSdk(AdjustConfig)` body replaced with
+  `return-void`. Anchor verified in the stock `base.apk` (`classes2.dex`).
 - **Unreleased** — `Force dark mode` for Tandem 6.38.0 (APKM and APK) is working and verified against
   the real APK; the empty scaffold is gone. Shared compatibility declarations and the
   `TandemApp.onCreate` fingerprint added. Pro, profile visitors and ads investigated and documented

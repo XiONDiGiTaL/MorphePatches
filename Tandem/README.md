@@ -10,7 +10,7 @@ required to use it.
 | | |
 | :--- | :--- |
 | Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes |
-| SHA-256 | `3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03` |
+| SHA-256 | `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d` |
 | Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
@@ -21,7 +21,7 @@ Verify the download before importing:
 
 ```bash
 sha256sum patches.mpp
-# 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03
+# f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d
 ```
 
 ## Patches in the bundle

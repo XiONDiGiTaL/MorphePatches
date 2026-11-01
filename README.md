@@ -67,7 +67,7 @@ No GitHub release tagged yet
 | [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
 
 Download: [`Tandem/patches.mpp`](Tandem/patches.mpp) — 54,178 bytes,
-`sha256 3f95839a9b1afb88f59ea0c90f9df523dea4c0ef837da3f073ec34ae2d8e3d03`. Import it in Morphe
+`sha256 f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`. Import it in Morphe
 Manager, or patch your stock Tandem 6.38.0 file with it directly.
 
 Supported versions: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK. The bundle builds

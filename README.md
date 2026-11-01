@@ -22,12 +22,12 @@
 
 [![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
 [![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
-[![Site](https://img.shields.io/badge/Site-xion%20patches-0c0e11?style=flat-square)](https://xiondigital.github.io/MorphePatches/)
+[![Site](https://img.shields.io/badge/Site-Morphe%20Patches-0c0e11?style=flat-square)](https://xiondigital.net/MorphePatches/)
 
 <a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
 <a href="#releases">02 / Releases</a> &nbsp; / &nbsp;
 <a href="#requests-and-issues">03 / Requests</a> &nbsp; / &nbsp;
-<a href="https://xiondigital.github.io/MorphePatches/">Site ↗</a>
+<a href="https://xiondigital.net/MorphePatches/">Site ↗</a>
 
 </div>
 
@@ -218,7 +218,7 @@ This project is intended to share independent modifications, not redistribute pr
 
 ---
 
-<a href="https://xiondigital.github.io/MorphePatches/">XiØN · Morphe Patches ↗</a>
+<a href="https://xiondigital.net/MorphePatches/">XiØN · Morphe Patches ↗</a>
 
 <sub>Independent patch collection — <a href="https://xiondigital.net">XiONDiGiTaL</a></sub>
 

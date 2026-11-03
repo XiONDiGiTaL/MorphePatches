@@ -3,7 +3,7 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
-The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.0`
+The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.1`
 release asset. Import either file in Morphe Manager and patch a stock Tandem 6.38.0 APK or APKM —
 nothing else is needed, and no build step is required to use it.
 
@@ -17,9 +17,9 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) — `patches-1.0.0.mpp`, 54,103 bytes |
-| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes (same four patches; CI rebuilds the zip at release time) |
-| SHA-256 | `patches.mpp` — `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`<br>release asset — `aa402bfed77657cdc4ee15d30908ddc5c6ac04a4c8e589b74247a7df6a107cd3` |
+| Release | [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) — `patches-1.0.1.mpp`, 54,103 bytes (2026-11-03) |
+| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes (same four patches, but a separate build from the release asset — match the hash of the file you actually have) |
+| SHA-256 | `patches.mpp` — `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`<br>release asset — `e2b173f4dfdfa1ff36f50def093a68caa48bf882aa14e5cb4c546ed80a4f1e44` |
 | Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
@@ -189,7 +189,7 @@ is unaffected. Tandem's Firebase Analytics usage is a different SDK and is not t
 ## Install
 
 1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
-2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
+2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
 3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
    without it); enable the other three as wanted.
 4. Patch, then install. The result is signed differently from the store build, so uninstall the stock

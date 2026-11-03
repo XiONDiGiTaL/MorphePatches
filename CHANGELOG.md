@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.1...v1.0.2) (2026-11-03)
+
+### 🐛 Bug Fixes
+
+* **patches:** stop emptying method bodies through dexlib2's read-only list ([75c2aab](https://github.com/XiONDiGiTaL/MorphePatches/commit/75c2aabc6abdbc8962e0861e3967a9f08c6d7544))
+
 ## [1.0.1](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.0...v1.0.1) (2026-11-03)
 
 ### 🐛 Bug Fixes

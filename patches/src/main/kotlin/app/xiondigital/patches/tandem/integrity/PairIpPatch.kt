@@ -1,9 +1,9 @@
 package app.xiondigital.patches.tandem.integrity
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APK
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APKM
+import app.xiondigital.patches.tandem.shared.replaceBodyWithReturnVoid
 
 /**
  * Lets a patched, re-signed Tandem build start at all.
@@ -37,10 +37,7 @@ val bypassPairIpPatch = bytecodePatch(
 
     execute {
         listOf(PairIpVerifyIntegrityFingerprint, PairIpLicenseCheckFingerprint).forEach { fingerprint ->
-            fingerprint.method.apply {
-                implementation!!.instructions.clear()
-                addInstructions(0, "return-void")
-            }
+            fingerprint.method.replaceBodyWithReturnVoid()
         }
     }
 }

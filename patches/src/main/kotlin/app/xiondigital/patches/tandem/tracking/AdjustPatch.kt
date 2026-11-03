@@ -1,9 +1,9 @@
 package app.xiondigital.patches.tandem.tracking
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APK
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APKM
+import app.xiondigital.patches.tandem.shared.replaceBodyWithReturnVoid
 
 /**
  * Stops Tandem's Adjust attribution SDK from initialising.
@@ -28,9 +28,6 @@ val disableAdjustTrackingPatch = bytecodePatch(
     compatibleWith(COMPATIBILITY_TANDEM_APK, COMPATIBILITY_TANDEM_APKM)
 
     execute {
-        AdjustInitSdkFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
+        AdjustInitSdkFingerprint.method.replaceBodyWithReturnVoid()
     }
 }

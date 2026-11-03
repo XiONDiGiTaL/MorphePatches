@@ -1,9 +1,9 @@
 package app.xiondigital.patches.tandem.ads
 
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APK
 import app.xiondigital.patches.tandem.shared.Constants.COMPATIBILITY_TANDEM_APKM
+import app.xiondigital.patches.tandem.shared.replaceBodyWithReturnVoid
 
 /**
  * Stops Tandem from requesting and rendering ads.
@@ -44,53 +44,20 @@ val removeAdsPatch = bytecodePatch(
 
     execute {
         // Tandem's own community ad slot.
-        CommunityAdComposableFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
+        CommunityAdComposableFingerprint.method.replaceBodyWithReturnVoid()
 
         // AppLovin MAX.
-        MaxAppOpenAdLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        MaxInterstitialAdLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        MaxAdViewLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        MaxAdViewStartAutoRefreshFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
+        MaxAppOpenAdLoadFingerprint.method.replaceBodyWithReturnVoid()
+        MaxInterstitialAdLoadFingerprint.method.replaceBodyWithReturnVoid()
+        MaxAdViewLoadFingerprint.method.replaceBodyWithReturnVoid()
+        MaxAdViewStartAutoRefreshFingerprint.method.replaceBodyWithReturnVoid()
 
         // Meta Audience Network.
-        FacebookInterstitialLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        FacebookInterstitialLoadConfigFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        FacebookAdViewLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        FacebookAdViewLoadConfigFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        FacebookNativeAdLoadFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
-        FacebookNativeAdLoadConfigFingerprint.method.apply {
-            implementation!!.instructions.clear()
-            addInstructions(0, "return-void")
-        }
+        FacebookInterstitialLoadFingerprint.method.replaceBodyWithReturnVoid()
+        FacebookInterstitialLoadConfigFingerprint.method.replaceBodyWithReturnVoid()
+        FacebookAdViewLoadFingerprint.method.replaceBodyWithReturnVoid()
+        FacebookAdViewLoadConfigFingerprint.method.replaceBodyWithReturnVoid()
+        FacebookNativeAdLoadFingerprint.method.replaceBodyWithReturnVoid()
+        FacebookNativeAdLoadConfigFingerprint.method.replaceBodyWithReturnVoid()
     }
 }

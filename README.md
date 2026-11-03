@@ -43,19 +43,20 @@ Four working patches for **Tandem: Language exchange** 6.38.0, written against M
 shipped as a prebuilt bundle. Each one is a real change to Tandem's own dex, documented down to the
 method it anchors on and the exact code it injects.
 
-Version `v1.0.1` is tagged with the bundle attached, so the Morphe source link resolves and lists all
-four patches for `net.tandem` 6.38.0.
+Version `v1.0.1` carries the bundle that was applied to the APKMirror 6.38.0 APKM: all four patches
+run, and the patched dex was decompiled to confirm every replaced body. The first 1.0.1 asset aborted
+at patch time and has been withdrawn.
 
 </td>
 <td width="35%" valign="top">
 
 ### Release status
 
-**v1.0.1** — 2026-11-03
+**v1.0.1** — re-released 2026-11-03
 
 4 patches · `net.tandem` 6.38.0 · APK + APKM
 
-Patch applies to the stock APK; not yet run on a device
+Applies to the stock APKM; verified in the dex, not yet on a device
 
 [Downloads ↗](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest)
 
@@ -77,19 +78,18 @@ Two copies of the same bundle — take either:
 
 | Where | File | Size | SHA-256 |
 | :--- | :--- | ---: | :--- |
-| [Release `v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | `patches-1.0.1.mpp` | 54,103 B | `e2b173f4dfdfa1ff36f50def093a68caa48bf882aa14e5cb4c546ed80a4f1e44` |
-| This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 54,178 B | `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d` |
+| [Release `v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | `patches-1.0.1.mpp` | 54,129 B | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` |
+| This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 54,129 B | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` |
 
-Both contain the same four patches and declare the same `Patcher-Version: 2.1.0`, but they are two
-separate builds rather than one zip published twice: the in-repo copy's `classes.dex` is 31,568 B
-against the release asset's 31,536 B, while the four patch descriptors inside are the same. Match the
-hash of whichever file you downloaded. Import either in Morphe Manager, or patch your stock Tandem
-6.38.0 file with it directly.
+Both files are the same build, so either download matches that single hash. The bundle declares
+`Patcher-Version: 2.1.0`. Import it in Morphe Manager, or patch your stock Tandem 6.38.0 file with it
+directly.
 
 Supported: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK, minSdk 32. Any other
-version is refused by the bundle instead of being patched blindly. Fingerprint matches and dex
-assembly are verified against the stock APK; screen behaviour is not device-tested yet — the full
-status is in [Tandem/README.md](Tandem/README.md#testing-status).
+version is refused by the bundle instead of being patched blindly. The bundle was applied to the
+APKMirror 6.38.0 APKM — all four patches complete — and the patched dex was decompiled to confirm each
+change; screen behaviour is not device-tested yet — the full status is in
+[Tandem/README.md](Tandem/README.md#testing-status).
 
 ### Companion app — Tandem Study
 
@@ -112,7 +112,7 @@ not do.
 ### Generated patch list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
+> **[v1.0.1](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
 <details open>
 <summary>📦 Tandem: Language exchange&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
 <br>
@@ -163,8 +163,8 @@ Build the bundle locally with `./gradlew :patches:buildAndroid` — the
 
 | Release | Date | Bundle | Contents |
 | :--- | :--- | :--- | :--- |
-| [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | 2026-11-03 | [`patches-1.0.1.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.1/patches-1.0.1.mpp) | Same four Tandem 6.38.0 patches as `v1.0.0` — this release adds the offline companion app, no patch changes |
-| [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) | 2026-11-01 | [`patches-1.0.0.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.0/patches-1.0.0.mpp) | All four Tandem 6.38.0 patches, first published version |
+| [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | 2026-11-03 | [`patches-1.0.1.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.1/patches-1.0.1.mpp) | All four Tandem 6.38.0 patches plus the offline companion app. Re-released after the first 1.0.1 bundle failed at patch time; this bundle applies to the real APKM |
+| `v1.0.0` | 2026-11-01 | — | Retired: built before the patch-time fixes, so patching aborted. Use `v1.0.1` |
 
 Releases are automated. Every push to `main` runs semantic-release, which tags the next version,
 attaches the freshly built `.mpp`, regenerates `patches-list.json` and `patches-bundle.json`, and
@@ -215,9 +215,9 @@ version, so Morphe refuses anything else. No other app is covered yet.
 
 #### Are the patches tested?
 
-They build, load and apply to the real 6.38.0 dex files, and every fingerprint anchor was verified
-against that APK. None of it has been run on a device yet, which is why each patch is listed as
-experimental.
+They have been applied to the real 6.38.0 files: the bundle runs against the APKMirror APKM, all four
+patches complete, and the patched dex decompiles to the expected bodies. None of it has been run on a
+device yet, which is why each patch is listed as experimental.
 
 #### Can you make a patch for another app?
 

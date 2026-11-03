@@ -28,7 +28,7 @@ import com.android.tools.smali.dexlib2.AccessFlags
 internal object CommunityAdComposableFingerprint : Fingerprint(
     definingClass = "Ljhp;",
     name = "a",
-    accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.STATIC),
+    isStatic = true,
     returnType = "V",
     parameters = listOf(
         "Lex4;",

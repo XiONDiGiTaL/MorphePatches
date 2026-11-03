@@ -1,16 +1,17 @@
-## [1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.1...v1.0.2) (2026-11-03)
-
-### 🐛 Bug Fixes
-
-* **patches:** stop emptying method bodies through dexlib2's read-only list ([75c2aab](https://github.com/XiONDiGiTaL/MorphePatches/commit/75c2aabc6abdbc8962e0861e3967a9f08c6d7544))
-
 ## [1.0.1](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.0...v1.0.1) (2026-11-03)
 
+Re-released: the first `patches-1.0.1.mpp` aborted at patch time and has been withdrawn.
+
 ### 🐛 Bug Fixes
 
-* **companion:** add the offline Tandem Study app and document it ([b3ef14b](https://github.com/XiONDiGiTaL/MorphePatches/commit/b3ef14bbaaeaa987ceb61561dc80db2ad4929b70))
+* **patches:** empty method bodies through the implementation's own `removeInstruction` instead of dexlib2's read-only instruction list
+* **patches:** match the community ad composable with `isStatic`, because Morphe compares `accessFlags` exactly and the method is `public static final`
+* **companion:** add the offline Tandem Study app and document it
 
-## 1.0.0 (2026-11-01)
+## 1.0.0 (2026-11-01) — retired
+
+The first published bundle, built before both patch-time fixes below. Patching with it aborts before
+any change is made; use 1.0.1 instead.
 
 ### ✨ New Features
 

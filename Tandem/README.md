@@ -17,20 +17,20 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) — `patches-1.0.1.mpp`, 54,103 bytes (2026-11-03) |
-| Bundle | [`patches.mpp`](patches.mpp) — 54,178 bytes (same four patches, but a separate build from the release asset — match the hash of the file you actually have) |
-| SHA-256 | `patches.mpp` — `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d`<br>release asset — `e2b173f4dfdfa1ff36f50def093a68caa48bf882aa14e5cb4c546ed80a4f1e44` |
+| Release | [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) — `patches-1.0.1.mpp`, 54,129 bytes (2026-11-03, re-released) |
+| Bundle | [`patches.mpp`](patches.mpp) — 54,129 bytes (the same build as the release asset) |
+| SHA-256 | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` (both files) |
 | Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
 | Format | APK and APKM (compatibility entries for both) |
-| Status | **Experimental** — builds, loads, and applies to the real 6.38.0 dex files; not yet run on a device |
+| Status | **Experimental** — applies to the real 6.38.0 APKM and the patched dex is verified; not yet run on a device |
 
 Verify the download before importing:
 
 ```bash
 sha256sum patches.mpp
-# f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d
+# dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b
 ```
 
 ## Patches in the bundle
@@ -213,9 +213,10 @@ Reference file: APKMirror universal bundle
 | `:patches:buildAndroid` produces the bundle | Pass |
 | Bundle loads via Morphe's `loadPatchesFromJar` | Pass |
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
-| Patch applies to the real 6.38.0 `base.apk` (fingerprint match + dex assembly) | Pass |
+| Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all four patches complete; 11 classes rewritten |
 | Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
 | All 14 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
+| Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `onCreate()` starts with `setApplicationNightMode(2)` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
 | Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
 | Ad slot absence, login, messaging | **Not tested** — same reason |
@@ -258,7 +259,22 @@ packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or se
 
 ## Changelog
 
-### 1.0.0 — 2026-11-01
+### 1.0.1 — 2026-11-03
+
+Re-release of 1.0.1 with the bundle that actually applies. The first 1.0.1 asset, like 1.0.0, aborted
+at patch time, so it was withdrawn.
+
+- `Bypass PairIP checks`, `Remove ads` and `Disable Adjust tracking` emptied bodies with
+  `instructions.clear()`, which always throws `UnsupportedOperationException` on dexlib2's read-only
+  instruction list. They now go through the implementation's own `removeInstruction`.
+- The community-ad fingerprint declared `public static`, but Morphe compares `accessFlags` exactly and
+  the method is `public static final`. It now matches with `isStatic`.
+- The offline companion app, [Tandem Study](../companion/README.md), ships alongside the bundle.
+
+### 1.0.0 — 2026-11-01 (retired)
+
+The first published bundle. It contains the same patch-time defects fixed in 1.0.1, so patching with
+it aborts before any change; use 1.0.1.
 
 First tagged release: [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
 with `patches-1.0.0.mpp` attached, and `patches-list.json` published so the Morphe source link lists

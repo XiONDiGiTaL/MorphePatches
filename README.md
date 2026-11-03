@@ -71,7 +71,7 @@ Patch applies to the stock APK; not yet run on a device
 
 | App | Package | Patches |
 | --- | --- | --- |
-| [Tandem](Tandem/) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
+| [Tandem](Tandem/README.md) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) — 6.38.0 only |
 
 Two copies of the same bundle — take either:
 
@@ -88,6 +88,24 @@ Supported: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK, minSd
 version is refused by the bundle instead of being patched blindly. Fingerprint matches and dex
 assembly are verified against the stock APK; screen behaviour is not device-tested yet — the full
 status is in [Tandem/README.md](Tandem/README.md#testing-status).
+
+### Companion app — Tandem Study
+
+The learning features a patch cannot add ship as a separate offline app in
+[`companion/`](companion/README.md): it imports the archive from Tandem's own
+**Profile → Settings → Download my data** and builds a vocabulary list, conversation statistics,
+search and spaced-repetition review with reminders. It has no `INTERNET` permission and does not
+touch Tandem itself.
+
+<p>
+<img src="companion/screenshots/words.png" alt="Word list built from the export" width="215">
+<img src="companion/screenshots/stats.png" alt="Message counts, activity and most used words" width="215">
+<img src="companion/screenshots/review.png" alt="Vocabulary review and reminders" width="215">
+</p>
+
+See [Tandem/README.md](Tandem/README.md#companion-app-tandem-study) for the full set and
+[`companion/README.md`](companion/README.md) for how the import works and what it deliberately does
+not do.
 
 ### Generated patch list
 

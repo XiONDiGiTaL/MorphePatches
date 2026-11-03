@@ -11,6 +11,10 @@ Adding `XiONDiGiTaL/MorphePatches` as a source
 (`https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches`) lists the same four patches
 inside Morphe.
 
+The learning features a patch cannot add — vocabulary extraction, statistics, search and spaced
+review — live in a separate offline app, [Tandem Study](../companion/README.md), described
+[below](#companion-app-tandem-study).
+
 | | |
 | :--- | :--- |
 | Release | [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) — `patches-1.0.0.mpp`, 54,103 bytes |
@@ -269,6 +273,24 @@ all four patches.
   in `classes2.dex`.
 - `Force dark mode`: `UiModeManager.setApplicationNightMode(2)` injected at `TandemApp.onCreate()`;
   verified against the real APK.
+
+## Companion app: Tandem Study
+
+The requested learning features — vocabulary extraction, conversation statistics, search over your
+own history, spaced-repetition review and daily reminders — need a store, an algorithm and a screen,
+which a dex patch cannot add. They ship as a separate offline app in
+[`../companion`](../companion/README.md), built on the archive Tandem already gives you through
+**Profile → Settings → Download my data**. No `INTERNET` permission, nothing uploaded, and Tandem
+itself is untouched.
+
+| Words | Statistics |
+| :---: | :---: |
+| ![Word list built from the export](../companion/screenshots/words.png) | ![Message counts, activity and most used words](../companion/screenshots/stats.png) |
+| **Search** | **Review and reminders** |
+| ![Searching imported messages](../companion/screenshots/search.png) | ![Vocabulary review with a daily reminder](../companion/screenshots/review.png) |
+
+These are rendered from the app's own screens by `ScreenshotTest` (Robolectric with seeded data), not
+mock-ups, and regenerated the same way.
 
 ## Back to the collection
 

@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.0...v1.0.1) (2026-11-03)
+
+### 🐛 Bug Fixes
+
+* **companion:** add the offline Tandem Study app and document it ([b3ef14b](https://github.com/XiONDiGiTaL/MorphePatches/commit/b3ef14bbaaeaa987ceb61561dc80db2ad4929b70))
+
 ## 1.0.0 (2026-11-01)
 
 ### ✨ New Features

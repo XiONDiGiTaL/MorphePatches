@@ -340,6 +340,21 @@ ul { margin: 0; padding: 0; list-style: none; }
   color: #c9d6ee; word-break: break-all; flex: 1 1 220px;
 }
 
+/* ------------------------------------------------------------------ shots */
+.shots {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px; align-items: start;
+}
+.shot {
+  margin: 0; overflow: hidden; border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm); background: var(--bg-raised);
+}
+.shot img { width: 100%; border-bottom: 1px solid var(--line); }
+.shot figcaption {
+  padding: 9px 11px; font-family: var(--font-mono); font-size: 0.55rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted-dim);
+}
+
 /* ----------------------------------------------------------------- footer */
 .site-footer { border-top: 1px solid var(--line); padding-block: clamp(38px, 5vw, 60px); }
 .footer__grid {

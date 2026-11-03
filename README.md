@@ -21,7 +21,7 @@
 *Independent Android patches and adaptations for [Morphe](https://morphe.software).*
 
 [![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
-[![Release: v1.0.0](https://img.shields.io/badge/Release-v1.0.0-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0)
+[![Release: v1.0.1](https://img.shields.io/badge/Release-v1.0.1-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1)
 [![Site](https://img.shields.io/badge/Site-Morphe%20Patches-0c0e11?style=flat-square)](https://xiondigital.net/MorphePatches/)
 
 <a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
@@ -43,7 +43,7 @@ Four working patches for **Tandem: Language exchange** 6.38.0, written against M
 shipped as a prebuilt bundle. Each one is a real change to Tandem's own dex, documented down to the
 method it anchors on and the exact code it injects.
 
-Version `v1.0.0` is tagged with the bundle attached, so the Morphe source link resolves and lists all
+Version `v1.0.1` is tagged with the bundle attached, so the Morphe source link resolves and lists all
 four patches for `net.tandem` 6.38.0.
 
 </td>
@@ -51,7 +51,7 @@ four patches for `net.tandem` 6.38.0.
 
 ### Release status
 
-**v1.0.0** — 2026-11-01
+**v1.0.1** — 2026-11-03
 
 4 patches · `net.tandem` 6.38.0 · APK + APKM
 
@@ -77,12 +77,14 @@ Two copies of the same bundle — take either:
 
 | Where | File | Size | SHA-256 |
 | :--- | :--- | ---: | :--- |
-| [Release `v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) | `patches-1.0.0.mpp` | 54,103 B | `aa402bfed77657cdc4ee15d30908ddc5c6ac04a4c8e589b74247a7df6a107cd3` |
+| [Release `v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | `patches-1.0.1.mpp` | 54,103 B | `e2b173f4dfdfa1ff36f50def093a68caa48bf882aa14e5cb4c546ed80a4f1e44` |
 | This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 54,178 B | `f12f1b3df3dbd3b18c3cf98cd8b667eb06d14492cb71e3f1df66389bc1c4dd0d` |
 
-Both contain the same four patches and declare the same `Patcher-Version: 2.1.0`; the byte counts
-differ only because CI rebuilds the zip when it tags a release. Import either file in Morphe Manager,
-or patch your stock Tandem 6.38.0 file with it directly.
+Both contain the same four patches and declare the same `Patcher-Version: 2.1.0`, but they are two
+separate builds rather than one zip published twice: the in-repo copy's `classes.dex` is 31,568 B
+against the release asset's 31,536 B, while the four patch descriptors inside are the same. Match the
+hash of whichever file you downloaded. Import either in Morphe Manager, or patch your stock Tandem
+6.38.0 file with it directly.
 
 Supported: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK, minSdk 32. Any other
 version is refused by the bundle instead of being patched blindly. Fingerprint matches and dex
@@ -161,12 +163,15 @@ Build the bundle locally with `./gradlew :patches:buildAndroid` — the
 
 | Release | Date | Bundle | Contents |
 | :--- | :--- | :--- | :--- |
+| [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | 2026-11-03 | [`patches-1.0.1.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.1/patches-1.0.1.mpp) | Same four Tandem 6.38.0 patches as `v1.0.0` — this release adds the offline companion app, no patch changes |
 | [`v1.0.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.0) | 2026-11-01 | [`patches-1.0.0.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.0/patches-1.0.0.mpp) | All four Tandem 6.38.0 patches, first published version |
 
 Releases are automated. Every push to `main` runs semantic-release, which tags the next version,
 attaches the freshly built `.mpp`, regenerates `patches-list.json` and `patches-bundle.json`, and
 rewrites the patch table above. `patches-list.json` is the file the Morphe add-source link reads, so a
-tagged release is what makes these patches appear in the app.
+tagged release is what makes these patches appear in the app. The release number it tags comes from the
+commit prefix in `main`'s history — `feat` → minor, `fix` → patch, `chore`/`docs` → no release — so the
+prefix decides whether a change ships as 1.0.x or 1.1.0.
 
 Only patch bundles are distributed here. Original and prepatched proprietary application packages are not.
 
@@ -179,7 +184,7 @@ Only patch bundles are distributed here. Original and prepatched proprietary app
 | Tested | Confirmed on a device, with the app version and setup recorded |
 | Released | Included in a published bundle |
 
-All four Tandem patches are **Experimental** in `v1.0.0`.
+All four Tandem patches are **Experimental** in `v1.0.1`.
 
 </details>
 
@@ -191,7 +196,7 @@ All four Tandem patches are **Experimental** in `v1.0.0`.
 
 [Suggest a patch or report an issue ↗](https://github.com/XiONDiGiTaL/MorphePatches/issues)
 
-When reporting a bug, include the Tandem version, the bundle version (`v1.0.0`), which patches were selected, your Android version, and reproduction steps. Remove personal information and credentials from logs.
+When reporting a bug, include the Tandem version, the bundle version (`v1.0.1`), which patches were selected, your Android version, and reproduction steps. Remove personal information and credentials from logs.
 
 <br />
 

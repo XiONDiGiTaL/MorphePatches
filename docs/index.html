@@ -234,8 +234,10 @@
               <h3 class="step__title">Keep PairIP bypass enabled</h3>
               <p class="step__copy">
                 Patch, then install the re-signed build. Leave <strong>Bypass PairIP checks</strong> on —
-                without it the patched app won't start. Enable <strong>Clone package</strong> if you want it
-                to install next to the official app rather than replace it.
+                a re-signed build is rejected at startup without it. Enable <strong>Clone package</strong> if
+                you want it to install next to the official app rather than replace it. Heads up: in the
+                2026-11-04 device test the patched build still stopped at Tandem's licence gate, so these
+                patches do not produce a runnable app yet.
               </p>
             </div>
           </div>
@@ -369,9 +371,11 @@
             The bundle applies to the APKMirror 6.38.0 APKM: all five patches complete, the patched dex was
             decompiled to confirm every replaced body and the injected night-mode call, and with
             <strong>Clone package</strong> enabled the installed id, provider authorities, signature permission
-            and task affinity are renamed as documented. None of it has been run on a device yet, which is why
-            every patch is listed as <strong>Experimental</strong>. When a patch has been confirmed on hardware,
-            that status changes — not before.
+            and task affinity are renamed as documented. It has since been run on a device
+            (SM-S918U, Android 17): the clone installs as its own app, but Tandem's licence gate opens Google
+            Play and the process dies inside <code class="inline-code">libpairipcore.so</code> before the UI.
+            That is why every patch is still listed as <strong>Experimental</strong>. When a build survives
+            launch on hardware, that status changes — not before.
           </p>
         </div>
       </div>

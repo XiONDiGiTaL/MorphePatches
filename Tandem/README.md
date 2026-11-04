@@ -24,7 +24,7 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
 | Format | APK and APKM (compatibility entries for both) |
-| Status | **Experimental** — applies to the real 6.38.0 APKM and the patched dex is verified; not yet run on a device |
+| Status | **Experimental** — applies to the real 6.38.0 APKM and the patched dex is verified; the first device test installs the clone but is stopped by Tandem's licence gate at launch ([DEVICE-TEST.md](DEVICE-TEST.md)) |
 
 Verify the download before importing:
 
@@ -87,7 +87,7 @@ force-inverted.
 
 ### Bypass PairIP checks
 
-**Effect.** Lets a patched, re-signed build start — and stay started. 6.38.0 is protected with PairIP:
+**Effect.** Removes the dex-level PairIP gates that reject a patched, re-signed build. 6.38.0 is protected with PairIP:
 the manifest declares `com.pairip.application.Application`, whose `attachBaseContext` runs two gates
 before Tandem initialises.
 
@@ -134,6 +134,13 @@ Lcom/pairip/licensecheck/LicenseClient;->startErrorDialogActivity()V            
 Lcom/pairip/licensecheck/LicenseClient;->scheduleAppShutdown()V                       # private
 Lcom/pairip/licensecheck/LicenseActivity;->onStart()V                                 # public
 ```
+
+**Device result (2026-11-04).** Not sufficient on hardware. With these six stubs installed and verified
+in the patched build, launching still opens Play's licence paywall
+(`store/license/paywall?id=net.tandem`) and the process then dies with SIGSEGV inside
+`libpairipcore.so` — enforcement runs below the layer this patch edits. An unpatched sideloaded copy of
+the same APK behaves the same way, so the gate is the licence check rather than the patches. Details in
+[DEVICE-TEST.md](DEVICE-TEST.md).
 
 **Not touched.** PairIP's method-level protection (`VMRunner`, `StartupLauncher`) stays active, so the
 classes it decrypts at runtime still load. That runtime is why the licence activity is closed rather
@@ -305,16 +312,20 @@ Reference file: APKMirror universal bundle
 | All 18 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `onCreate()` starts with `setApplicationNightMode(2)` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
-| Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
+| Installs as a separate clone on hardware | Pass — SM-S918U, Android 17: `adb install` succeeds, `app.xiondigital.tandem` listed beside `net.tandem` |
+| Launches and reaches sign-in | **Fail** — Play's licence paywall opens, then the process dies with SIGSEGV in `libpairipcore.so`; see [DEVICE-TEST.md](DEVICE-TEST.md) |
+| Dark mode on screens, dialogs, navigation | **Not tested** — the app never gets past the licence gate |
 | Ad slot absence, login, messaging | **Not tested** — same reason |
 
-The last two rows decide whether this bundle is usable; until they are confirmed on a device it stays
-experimental.
+The last rows decide whether this bundle is usable. It stays experimental until a build survives launch
+on hardware.
 
 ## Known limitations
 
-- **Not device-tested.** Everything above is checks against the APK's own dex and resources, not
-  screen behaviour.
+- **Does not launch on a device yet.** The 2026-11-04 hardware test installs the clone but Tandem's
+  licence gate opens Google Play and the process dies inside `libpairipcore.so`; see
+  [DEVICE-TEST.md](DEVICE-TEST.md). Every other result above is a check against the APK's own dex and
+  resources, not screen behaviour.
 - **No in-app toggle.** Each patch is on or off at patch time; a runtime switch would need a settings
   destination and a persisted preference inside Tandem's settings architecture.
 - **Only night-aware UI changes.** Screens, WebViews or creatives that ignore `uiMode` look the same as

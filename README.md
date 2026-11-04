@@ -58,7 +58,7 @@ the signature permission or Tandem's own call-control broadcasts.
 
 5 patches · `net.tandem` 6.38.0 · APK + APKM
 
-Applies to the stock APKM; verified in the dex, not yet confirmed on a device
+Applies to the stock APKM; device test 2026-11-04: installs, blocked at launch by Tandem's licence gate
 
 [Downloads ↗](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest)
 
@@ -90,8 +90,10 @@ directly.
 Supported: Tandem `6.38.0` (versionCode 11568), APKM bundle or single APK, minSdk 32. Any other
 version is refused by the bundle instead of being patched blindly. The bundle was applied to the
 APKMirror 6.38.0 APKM — all five patches complete — and the patched dex and manifest were decompiled to
-confirm each change; screen behaviour is not device-tested yet — the full status is in
-[Tandem/README.md](Tandem/README.md#testing-status).
+confirm each change. The first device test (2026-11-04) installs the clone beside the official app but
+Tandem's licence gate sends the user to Google Play and the process dies before its UI — the full status
+is in [Tandem/README.md](Tandem/README.md#testing-status) and
+[Tandem/DEVICE-TEST.md](Tandem/DEVICE-TEST.md).
 
 ### Companion app — Tandem Study
 
@@ -189,7 +191,8 @@ Only patch bundles are distributed here. Original and prepatched proprietary app
 | Tested | Confirmed on a device, with the app version and setup recorded |
 | Released | Included in a published bundle |
 
-All five Tandem patches are **Experimental** in `v1.1.0`.
+All five Tandem patches are **Experimental** in `v1.1.0`. The 2026-11-04 device test did not get past
+launch — see [Tandem/DEVICE-TEST.md](Tandem/DEVICE-TEST.md) — so none of them qualify as Tested.
 
 </details>
 
@@ -223,8 +226,10 @@ version, so Morphe refuses anything else. No other app is covered yet.
 
 They have been applied to the real 6.38.0 files: the bundle runs against the APKMirror APKM, all five
 patches complete, the patched dex decompiles to the expected bodies, and with **Clone package** enabled
-the installed id, provider authorities and task affinity are renamed as documented. None of it has been
-run on a device yet, which is why each patch is listed as experimental.
+the installed id, provider authorities and task affinity are renamed as documented. It has also been run
+on hardware: the clone installs as its own app, but Tandem's licence gate opens Google Play and kills
+the process before the UI, which is why every patch stays experimental — see
+[Tandem/DEVICE-TEST.md](Tandem/DEVICE-TEST.md).
 
 #### Can you make a patch for another app?
 

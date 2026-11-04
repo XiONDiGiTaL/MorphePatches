@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.2...v1.1.0) (2026-11-04)
+
+### ✨ New Features
+
+* **tandem:** add a clone package patch ([d8fb4fb](https://github.com/XiONDiGiTaL/MorphePatches/commit/d8fb4fb359d9aefc35f9b09f16127000d564caef))
+
+### 🐛 Bug Fixes
+
+* **ci:** read the clone id from the binary manifest as UTF-16 ([09c6f4b](https://github.com/XiONDiGiTaL/MorphePatches/commit/09c6f4bab85271160d0e41f9731e847069950054))
+
 ## [1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.1...v1.0.2) (2026-11-04)
 
 ### 🐛 Bug Fixes

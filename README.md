@@ -112,9 +112,9 @@ not do.
 ### Generated patch list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;4 patches total
+> **[v1.1.0](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.1.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;5 patches total
 <details open>
-<summary>📦 Tandem: Language exchange&nbsp;&nbsp;•&nbsp;&nbsp;4 patches</summary>
+<summary>📦 Tandem: Language exchange&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>
 
 **Package name:** `net.tandem`
@@ -127,6 +127,7 @@ not do.
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
 | [Bypass PairIP checks](#bypass-pairip-checks) | Skips PairIP's APK signature and Play licence checks, which otherwise stop a re-signed build from starting. Required for any patched Tandem build to run. |  |
+| [Clone package](#clone-package) | Installs the patched build under its own application id (app.xiondigital.tandem by default), so it can sit next to the official Tandem app instead of replacing and conflicting with it. Off by default: a clone starts empty, and Google/Facebook sign-in, push tokens, Play purchases and verified App Links stay bound to the original package. | • Package name |
 | [Disable Adjust tracking](#disable-adjust-tracking) | Stops the bundled Adjust attribution SDK from initialising, so no install, session or event attribution is sent. |  |
 | [Force dark mode](#force-dark-mode) | Turns on Tandem's own dark theme, regardless of the system dark-mode setting. |  |
 | [Remove ads](#remove-ads) | Removes Tandem's community ad slot and blocks the bundled AppLovin MAX and Meta Audience Network SDKs from requesting ads. |  |

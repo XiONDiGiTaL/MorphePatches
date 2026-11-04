@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "patches": [
     {
       "name": "Bypass PairIP checks",
@@ -46,6 +46,61 @@
         }
       ],
       "options": []
+    },
+    {
+      "name": "Clone package",
+      "description": "Installs the patched build under its own application id (app.xiondigital.tandem by default), so it can sit next to the official Tandem app instead of replacing and conflicting with it. Off by default: a clone starts empty, and Google/Facebook sign-in, push tokens, Play purchases and verified App Links stay bound to the original package.",
+      "default": false,
+      "category": null,
+      "compatiblePackages": [
+        {
+          "packageName": "net.tandem",
+          "name": "Tandem: Language exchange",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#2CC0D8",
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "6.38.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 32,
+              "description": null
+            }
+          ]
+        },
+        {
+          "packageName": "net.tandem",
+          "name": "Tandem: Language exchange",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#2CC0D8",
+          "signatures": null,
+          "formFactor": "MOBILE",
+          "targets": [
+            {
+              "version": "6.38.0",
+              "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": 32,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "packageName",
+          "title": "Package name",
+          "description": "Application id the patched build installs as. Must not be net.tandem.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "app.xiondigital.tandem",
+          "values": null
+        }
+      ]
     },
     {
       "name": "Disable Adjust tracking",

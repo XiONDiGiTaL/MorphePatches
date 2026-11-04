@@ -140,9 +140,15 @@ in the patched build, launching still opens Play's licence paywall
 (`store/license/paywall?id=net.tandem`) and the process then dies with SIGSEGV inside
 `libpairipcore.so` — enforcement runs below the layer this patch edits. An unpatched sideloaded copy of
 the same APK behaves the same way, so the gate is the app's protection rather than the patches.
-Unwrapping PairIP's application class and disabling Play were both tried on the device; neither
-changed the outcome — Tandem's own startup loads `libpairipcore.so` from `VMRunner`, and the native
-check kills the process. Details in [DEVICE-TEST.md](DEVICE-TEST.md).
+Unwrapping PairIP's application class, disabling Play, and stubbing `checkLicense` itself were all
+tried on the device; none changed the outcome.
+
+Patching the library does not rescue it either. The first crash is at `0x330c4`, where a range length
+is loaded with `ldrsh`, goes negative for lengths over 32,767 and walks 1.5 MB past its buffer; fixing
+that length load merely moves the crash to a second copy of the same hash loop (`0x5fd9c`), and fixing
+all three such loads moves it to a table walk at `0x50c24`. Each repair reveals the next fault, because
+the data the verifier is handed cannot be reconstructed from a re-signed APK. A run therefore needs a
+PairIP-free build, not another instruction patch. Details in [DEVICE-TEST.md](DEVICE-TEST.md).
 
 **Not touched.** PairIP's method-level protection (`VMRunner`, `StartupLauncher`) stays active, so the
 classes it decrypts at runtime still load. That runtime is why the licence activity is closed rather

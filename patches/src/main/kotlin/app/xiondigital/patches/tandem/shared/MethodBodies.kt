@@ -39,3 +39,23 @@ internal fun MutableMethod.replaceBodyWithReturnVoid() {
     if (instructionCount > 0) removeInstructions(instructionCount)
     addInstructions(0, "return-void")
 }
+
+/**
+ * Replaces a method's whole body with `finish()` followed by `return-void`.
+ *
+ * For activities that exist only to show a dialog: closing them in `onStart()` leaves whatever is
+ * underneath untouched, whereas an empty body would leave an invisible window on screen that never
+ * finishes.
+ */
+internal fun MutableMethod.replaceBodyWithFinish() {
+    val instructionCount = implementation?.instructions?.size ?: return
+
+    if (instructionCount > 0) removeInstructions(instructionCount)
+    addInstructions(
+        0,
+        """
+            invoke-virtual {p0}, Landroid/app/Activity;->finish()V
+            return-void
+        """,
+    )
+}

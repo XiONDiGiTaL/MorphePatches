@@ -35,3 +35,58 @@ internal object PairIpLicenseCheckFingerprint : Fingerprint(
     returnType = "V",
     parameters = listOf("Landroid/content/Context;"),
 )
+
+/**
+ * `com.pairip.licensecheck.LicenseClient.startPaywallActivity(PendingIntent)`.
+ *
+ * The paywall itself: it fires the pending intent Play's licensing response carries (the store
+ * listing) and then calls `closeApp()`, which finishes the task and kills the process. Sidestepping
+ * the checks is not enough on its own — anything that reaches this method still throws the user out
+ * of the app and into Play.
+ */
+internal object PairIpLicensePaywallFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "startPaywallActivity",
+    accessFlags = listOf(AccessFlags.PRIVATE),
+    returnType = "V",
+    parameters = listOf("Landroid/app/PendingIntent;"),
+)
+
+/** `com.pairip.licensecheck.LicenseClient.startErrorDialogActivity()` — the failure twin of the paywall. */
+internal object PairIpLicenseErrorDialogFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "startErrorDialogActivity",
+    accessFlags = listOf(AccessFlags.PRIVATE),
+    returnType = "V",
+    parameters = emptyList(),
+)
+
+/**
+ * `com.pairip.licensecheck.LicenseClient.scheduleAppShutdown()`.
+ *
+ * Arms a 30-second delayed `exitAction` whenever a check fails softly, so the app keeps working
+ * just long enough for the user to think it started and then disappears.
+ */
+internal object PairIpLicenseShutdownFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseClient;",
+    name = "scheduleAppShutdown",
+    accessFlags = listOf(AccessFlags.PRIVATE),
+    returnType = "V",
+    parameters = emptyList(),
+)
+
+/**
+ * `com.pairip.licensecheck.LicenseActivity.onStart()`.
+ *
+ * The only screen in the licence flow: it reads `activitytype` from its intent and shows either the
+ * paywall or the error dialog. Making it finish immediately means a licence activity that is
+ * started from anywhere — including the runtime that PairIP decodes at startup, which no dex
+ * fingerprint can see — never puts a Play prompt in front of the user.
+ */
+internal object PairIpLicenseActivityStartFingerprint : Fingerprint(
+    definingClass = "Lcom/pairip/licensecheck/LicenseActivity;",
+    name = "onStart",
+    accessFlags = listOf(AccessFlags.PUBLIC),
+    returnType = "V",
+    parameters = emptyList(),
+)

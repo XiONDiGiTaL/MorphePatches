@@ -3,12 +3,12 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
-The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.2`
+The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.1.0`
 release asset. Import either file in Morphe Manager and patch a stock Tandem 6.38.0 APK or APKM —
 nothing else is needed, and no build step is required to use it.
 
 Adding `XiONDiGiTaL/MorphePatches` as a source
-(`https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches`) lists the same four patches
+(`https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches`) lists the same five patches
 inside Morphe.
 
 The learning features a patch cannot add — vocabulary extraction, statistics, search and spaced
@@ -17,10 +17,10 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | [`v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) — `patches-1.0.2.mpp`, 59,233 bytes (2026-11-04) |
-| Bundle | [`patches.mpp`](patches.mpp) — 59,233 bytes (the same build as the release asset) |
-| SHA-256 | `d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce` (both files) |
-| Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
+| Release | [`v1.1.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.1.0) — `patches-1.1.0.mpp`, 74,124 bytes (2026-11-04) |
+| Bundle | [`patches.mpp`](patches.mpp) — 74,124 bytes (the same build as the release asset) |
+| SHA-256 | `0034159ee9a8ba74d7f540f2ca48f5c57cf4d805f68639da575d991e1f5f2af9` (both files) |
+| Contents | 5 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking, Clone package |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
 | Format | APK and APKM (compatibility entries for both) |
@@ -30,12 +30,13 @@ Verify the download before importing:
 
 ```bash
 sha256sum patches.mpp
-# d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce
+# 0034159ee9a8ba74d7f540f2ca48f5c57cf4d805f68639da575d991e1f5f2af9
 ```
 
 ## Patches in the bundle
 
-All four are enabled by default; each can be turned off individually in Morphe Manager.
+Four are enabled by default; each can be turned off individually in Morphe Manager. **Clone package** is
+off by default, because it changes which app you are installing.
 
 | Patch | What it changes | Methods touched |
 | :--- | :--- | :--- |
@@ -43,10 +44,12 @@ All four are enabled by default; each can be turned off individually in Morphe M
 | [Bypass PairIP checks](#bypass-pairip-checks) | Empties PairIP's signature and licence checks, and closes the licence screen it falls back to | 6 |
 | [Remove ads](#remove-ads) | Empties Tandem's community-ad composable and the ad SDKs' load methods | 11 |
 | [Disable Adjust tracking](#disable-adjust-tracking) | Empties `Adjust.initSdk(...)` | 1 |
+| [Clone package](#clone-package) (opt-in) | Installs the patched build under its own application id, next to the official app | 10 dex literals, plus the manifest |
 
-Every patch is confined to methods that already exist in the APK: nothing is added to the manifest, no
-permission changes, no service is redirected, and the only injected code is the single night-mode call
-in the dark-mode patch.
+Every patch is confined to methods and identifiers that already exist in the APK: nothing is added to
+the manifest, no component is redirected, and the only injected code is the single night-mode call in
+the dark-mode patch. The one patch that edits the manifest is **Clone package**, which only rewrites the
+identifiers Tandem already declares, and only when you enable it.
 
 ---
 
@@ -209,14 +212,69 @@ is unaffected. Tandem's Firebase Analytics usage is a different SDK and is not t
 
 ---
 
+### Clone package
+
+**Effect.** Installs the patched build under its own application id — `app.xiondigital.tandem` by
+default — so it sits next to the official Tandem app instead of replacing it. Android treats the two as
+different apps: separate icon, separate data directory, separate notification channels, and no
+uninstall of the store build just to run the patched one.
+
+**Change.** Android identifies an installed app by its manifest's `package` attribute, and several
+other identifiers are matched against that value elsewhere. All of them move together:
+
+| Where | What changes | Why it has to |
+| :--- | :--- | :--- |
+| `AndroidManifest.xml` | `package="net.tandem"` → the clone's id | The application id itself |
+| Manifest permissions | `net.tandem.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` (the declaration **and** the `<uses-permission>`) | It is a signature-level permission the app declares; a second app declaring that name with a different certificate is refused at install. AndroidX derives the same name from `getPackageName()` at runtime, so both sides stay consistent |
+| Manifest providers | All nine authorities, e.g. `net.tandem.fileprovider`, `net.tandem.firebaseinitprovider`, `net.tandem.FacebookInitProvider` | An authority is a device-wide name; two apps holding one collide, and whichever installed first wins |
+| Manifest activity | `net.tandem.wxapi.WXEntryActivity`'s `android:taskAffinity` | Task affinity is matched across packages, so keeping Tandem's could route the clone into the official app's task |
+| Dex literals | `net.tandem.fileprovider`; `android.resource://net.tandem/raw/sound_chat_received` and `…/sound_call_incoming`; `net.tandem.call.ACTION_HANG_UP`, `ACTION_TOGGLE_MIC`, `ACTION_TOGGLE_CAM`; `net.tandem.chat_ui.AUDIO_PLAYER_START`, `STOP`, `PAUSE`, `RESUME` | Tandem compiles these in as strings instead of deriving them. The FileProvider authority and the two notification sounds are resolved against the installed package, and the seven broadcast actions are dispatched by the in-call screen and the chat audio player — `sendBroadcast` is system-wide, so a shared action would let a call in the clone toggle the microphone of a call in the official app |
+
+```smali
+# before
+const-string v0, "net.tandem.fileprovider"
+
+# after (default option)
+const-string v0, "app.xiondigital.tandem.fileprovider"
+```
+
+A **Package name** option sets the id; it must be a valid, dotted application id and cannot be
+`net.tandem`. The manifest rewrites refuse to run on a package that is not `net.tandem`, and each of the
+ten literals must still be present in the dex, so an app update that stops referencing one of them fails
+the patch instead of shipping a clone whose authority or broadcasts point at the app it was cloned from.
+
+**Left alone on purpose.** Tandem's own class descriptors (`Lnet/tandem/…;`), its kotlinx.serialization
+class names, its notification channel and group ids (Android already scopes those to the package), its
+MQTT topics (`net.tandem.core.chats.event.p2p.typing_indicator.v1`) and its navigation route keys — none
+of those are matched against the installed package, and renaming them would break serialization, channel
+history or the server-side topic.
+
+**Not carried over.** A renamed application id is bound to the original package and signing certificate
+by the platform, so these stay attached to the official install:
+
+- Google and Facebook sign-in (OAuth clients are registered per package + certificate)
+- Firebase Cloud Messaging tokens, so push notifications do not arrive in the clone
+- Play Billing purchases / the Pro subscription
+- Verified App Links
+
+Tandem's own backend and its MQTT session are package-agnostic and keep working — a clone signs in with
+the same account, and both installs can be logged in at once.
+
+**Install order.** The clone is a separate app with its own data directory, so it starts empty; Tandem's
+local data is not migrated, and there is no supported way to copy it across without root.
+
+---
+
 ## Install
 
 1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
-2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
+2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.1.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.1.0) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the five patches.
 3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
-   without it); enable the other three as wanted.
-4. Patch, then install. The result is signed differently from the store build, so uninstall the stock
-   app first and have your login details ready.
+   without it); enable the others as wanted.
+4. **Either** keep **Clone package** off and uninstall the stock app first — the result is signed
+   differently from the store build, so it cannot install over it — **or** enable **Clone package** and
+   leave the stock app where it is: the patched build then installs beside it under its own id. A clone
+   starts with no local Tandem data and no push notifications, and has your login details ready.
 
 ## Compatibility
 
@@ -236,8 +294,11 @@ Reference file: APKMirror universal bundle
 | `:patches:buildAndroid` produces the bundle | Pass |
 | Bundle loads via Morphe's `loadPatchesFromJar` | Pass |
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
-| Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all four patches complete; 11 classes rewritten |
-| Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM |
+| Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all five patches complete; 20 classes rewritten |
+| Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM — including the opt-in clone patch, whose result is checked for the clone's id in the manifest |
+| Clone package renames the installed app | Pass — applied to the reference APKM and the result decompiled: `package="app.xiondigital.tandem"`, all nine authorities, the signature permission and `WXEntryActivity`'s task affinity renamed, and all ten dex literals rewritten |
+| Package name option takes a custom id | Pass — patched with `packageName=dev.xion.tandem` and the manifest and all ten literals followed it |
+| Clone patch rejects the original id | Pass by construction — the option validator refuses `net.tandem` and any non-dotted id |
 | Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
 | All 18 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `onCreate()` starts with `setApplicationNightMode(2)` |
@@ -262,6 +323,11 @@ experimental.
 - **Signing is still not Play's.** The patched build is signed with the patcher's key, so Play's own
   "installed by Play" checks and store updates will not recognise it; that is inherent to patching,
   not something a patch can restore.
+- **A clone is a second app.** It has its own data directory, so it starts signed out with no local
+  history, and Google/Facebook sign-in, push notifications, Play purchases and verified App Links stay
+  with the official install, as described under [Clone package](#clone-package).
+- **A clone does not hide its origin.** The application id and icon differ, but the code, resources and
+  network behaviour are Tandem's, so anything Tandem's servers decide from a client signal is unaffected.
 
 ## Warnings
 
@@ -306,6 +372,22 @@ Without the variable the job still builds the bundle and reports the apply step 
 also what happens on pull requests from forks, where the token is not available.
 
 ## Changelog
+
+### 1.1.0 — 2026-11-04
+
+A patched build is signed differently from the store APK, so installing it meant uninstalling Tandem
+first. The new **Clone package** patch installs it under its own application id instead, beside the
+official app.
+
+- `Clone package` (opt-in): rewrites the application id to `app.xiondigital.tandem` by default — a
+  `packageName` option takes any other valid id — together with the signature-level
+  `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, all nine provider authorities, `WXEntryActivity`'s
+  task affinity, and the ten package-name literals Tandem compiles into its dex (FileProvider
+  authority, both notification sound URIs, and the seven call and audio-player broadcast actions that
+  would otherwise reach both installs).
+- `patch-regression.yml` now also applies the clone patch, asserts all five patches are reported, and
+  checks the clone's id in the patched manifest — so the ten literal anchors are exercised on every
+  push.
 
 ### 1.0.2 — 2026-11-04
 

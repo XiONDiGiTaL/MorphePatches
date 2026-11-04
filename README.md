@@ -21,7 +21,7 @@
 *Independent Android patches and adaptations for [Morphe](https://morphe.software).*
 
 [![Morphe](https://img.shields.io/badge/Morphe-3f80ff?style=flat-square)](https://morphe.software)
-[![Release: v1.0.1](https://img.shields.io/badge/Release-v1.0.1-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1)
+[![Release: v1.0.2](https://img.shields.io/badge/Release-v1.0.2-79a8ff?style=flat-square)](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2)
 [![Site](https://img.shields.io/badge/Site-Morphe%20Patches-0c0e11?style=flat-square)](https://xiondigital.net/MorphePatches/)
 
 <a href="#patches">01 / Patches</a> &nbsp; / &nbsp;
@@ -43,20 +43,20 @@ Four working patches for **Tandem: Language exchange** 6.38.0, written against M
 shipped as a prebuilt bundle. Each one is a real change to Tandem's own dex, documented down to the
 method it anchors on and the exact code it injects.
 
-Version `v1.0.1` carries the bundle that was applied to the APKMirror 6.38.0 APKM: all four patches
-run, and the patched dex was decompiled to confirm every replaced body. The first 1.0.1 asset aborted
-at patch time and has been withdrawn.
+Version `v1.0.2` carries the bundle that was applied to the APKMirror 6.38.0 APKM: all four patches
+run, and the patched dex was decompiled to confirm every replaced body. It also closes PairIP's
+licence screen, which could throw a patched build into Google Play instead of starting it.
 
 </td>
 <td width="35%" valign="top">
 
 ### Release status
 
-**v1.0.1** — re-released 2026-11-03
+**v1.0.2** — 2026-11-04
 
 4 patches · `net.tandem` 6.38.0 · APK + APKM
 
-Applies to the stock APKM; verified in the dex, not yet on a device
+Applies to the stock APKM; verified in the dex, not yet confirmed on a device
 
 [Downloads ↗](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest)
 
@@ -78,8 +78,8 @@ Two copies of the same bundle — take either:
 
 | Where | File | Size | SHA-256 |
 | :--- | :--- | ---: | :--- |
-| [Release `v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | `patches-1.0.1.mpp` | 54,129 B | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` |
-| This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 54,129 B | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` |
+| [Release `v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) | `patches-1.0.2.mpp` | 59,233 B | `d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce` |
+| This repository | [`Tandem/patches.mpp`](Tandem/patches.mpp) | 59,233 B | `d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce` |
 
 Both files are the same build, so either download matches that single hash. The bundle declares
 `Patcher-Version: 2.1.0`. Import it in Morphe Manager, or patch your stock Tandem 6.38.0 file with it
@@ -163,8 +163,9 @@ Build the bundle locally with `./gradlew :patches:buildAndroid` — the
 
 | Release | Date | Bundle | Contents |
 | :--- | :--- | :--- | :--- |
-| [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | 2026-11-03 | [`patches-1.0.1.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.1/patches-1.0.1.mpp) | All four Tandem 6.38.0 patches plus the offline companion app. Re-released after the first 1.0.1 bundle failed at patch time; this bundle applies to the real APKM |
-| `v1.0.0` | 2026-11-01 | — | Retired: built before the patch-time fixes, so patching aborted. Use `v1.0.1` |
+| [`v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) | 2026-11-04 | [`patches-1.0.2.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.2/patches-1.0.2.mpp) | All four Tandem 6.38.0 patches plus the offline companion app. Empties PairIP's licence paywall, error dialog and delayed shutdown, so a patched build is no longer sent to Google Play at launch |
+| [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) | 2026-11-03 | [`patches-1.0.1.mpp`](https://github.com/XiONDiGiTaL/MorphePatches/releases/download/v1.0.1/patches-1.0.1.mpp) | Superseded: applied cleanly, but only emptied PairIP's two checks, so the licence screen could still open. Use `v1.0.2` |
+| `v1.0.0` | 2026-11-01 | — | Retired: built before the patch-time fixes, so patching aborted. Use `v1.0.2` |
 
 Releases are automated. Every push to `main` runs semantic-release, which tags the next version,
 attaches the freshly built `.mpp`, regenerates `patches-list.json` and `patches-bundle.json`, and
@@ -184,7 +185,7 @@ Only patch bundles are distributed here. Original and prepatched proprietary app
 | Tested | Confirmed on a device, with the app version and setup recorded |
 | Released | Included in a published bundle |
 
-All four Tandem patches are **Experimental** in `v1.0.1`.
+All four Tandem patches are **Experimental** in `v1.0.2`.
 
 </details>
 
@@ -196,7 +197,7 @@ All four Tandem patches are **Experimental** in `v1.0.1`.
 
 [Suggest a patch or report an issue ↗](https://github.com/XiONDiGiTaL/MorphePatches/issues)
 
-When reporting a bug, include the Tandem version, the bundle version (`v1.0.1`), which patches were selected, your Android version, and reproduction steps. Remove personal information and credentials from logs.
+When reporting a bug, include the Tandem version, the bundle version (`v1.0.2`), which patches were selected, your Android version, and reproduction steps. Remove personal information and credentials from logs.
 
 <br />
 

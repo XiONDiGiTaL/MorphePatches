@@ -152,6 +152,16 @@ jobs:
           jq -r '"Applied " + (.appliedPatches | length | tostring) + " patches: " + (.appliedPatches | join(", "))' \
             build/ci/report.json >> "$GITHUB_STEP_SUMMARY"
 
+      # The bundle that just proved it applies to the reference APK, so a release can ship exactly
+      # the bytes the check ran against instead of rebuilding them somewhere else.
+      - name: Upload the verified bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: patches-bundle
+          path: ${{ steps.bundle.outputs.path }}
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Upload the patch report
         if: always() && steps.reference.outputs.available == 'true'
         uses: actions/upload-artifact@v7

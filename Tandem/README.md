@@ -3,7 +3,7 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
-The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.1`
+The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.0.2`
 release asset. Import either file in Morphe Manager and patch a stock Tandem 6.38.0 APK or APKM —
 nothing else is needed, and no build step is required to use it.
 
@@ -17,9 +17,9 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) — `patches-1.0.1.mpp`, 54,129 bytes (2026-11-03, re-released) |
-| Bundle | [`patches.mpp`](patches.mpp) — 54,129 bytes (the same build as the release asset) |
-| SHA-256 | `dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b` (both files) |
+| Release | [`v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) — `patches-1.0.2.mpp`, 59,233 bytes (2026-11-04) |
+| Bundle | [`patches.mpp`](patches.mpp) — 59,233 bytes (the same build as the release asset) |
+| SHA-256 | `d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce` (both files) |
 | Contents | 4 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking |
 | Target | Tandem **6.38.0** (versionCode **11568**), `net.tandem`, minSdk 32, targetSdk 37 |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
@@ -30,7 +30,7 @@ Verify the download before importing:
 
 ```bash
 sha256sum patches.mpp
-# dd9444f4690f1fe6e895393d9980aea4fa358d2c2e71acdc30d55f1f8140f50b
+# d3b0c628f985b45f07086a4534fec737ee3556c1b788d4604858b644000033ce
 ```
 
 ## Patches in the bundle
@@ -212,7 +212,7 @@ is unaffected. Tandem's Firebase Analytics usage is a different SDK and is not t
 ## Install
 
 1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
-2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.1`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.1) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
+2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.0.2`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.0.2) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the four patches.
 3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
    without it); enable the other three as wanted.
 4. Patch, then install. The result is signed differently from the store build, so uninstall the stock
@@ -239,7 +239,7 @@ Reference file: APKMirror universal bundle
 | Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all four patches complete; 11 classes rewritten |
 | Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM |
 | Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
-| All 14 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
+| All 18 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `onCreate()` starts with `setApplicationNightMode(2)` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
 | Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
@@ -289,7 +289,7 @@ packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or se
 [`patch-regression.yml`](../.github/workflows/patch-regression.yml) builds the bundle, applies every
 patch it advertises to the reference 6.38.0 APKM with Morphe's own patcher, and fails unless the run
 reports all of them applied. Morphe aborts on the first fingerprint that stops matching, so this is the
-check that `v1.0.0` and the first `v1.0.1` never ran. The patcher release is pinned by tag and SHA-256
+check that `v1.0.0` and the first `v1.0.2` never ran. The patcher release is pinned by tag and SHA-256
 in the workflow.
 
 The reference APK is proprietary and is not committed. It is configured for this repository already:
@@ -306,6 +306,23 @@ Without the variable the job still builds the bundle and reports the apply step 
 also what happens on pull requests from forks, where the token is not available.
 
 ## Changelog
+
+### 1.0.2 — 2026-11-04
+
+A patched build could apply all four patches, start, and then be sent to Google Play, because
+PairIP's licence flow is a screen and a kill switch as well as a check.
+
+- `Bypass PairIP checks` now also empties `LicenseClient.startPaywallActivity` (fires the store
+  listing Play's licensing response carries, then calls `closeApp()`),
+  `LicenseClient.startErrorDialogActivity` and `LicenseClient.scheduleAppShutdown` (a 30-second
+  delayed exit).
+- `LicenseActivity.onStart()` finishes instead of drawing the paywall, so a licence activity started
+  from the runtime PairIP decrypts at startup cannot surface the prompt either.
+- `.github/workflows/patch-regression.yml` applies the built bundle to the pinned reference APKM on
+  every push and fails when a patch or fingerprint stops matching, and keeps the bundle it verified
+  as an artifact.
+- The reference APKM is configured as a release asset in a private fixture repository, reached
+  through `TANDEM_APKM_URL` and `TANDEM_APKM_TOKEN`.
 
 ### 1.0.1 — 2026-11-03
 

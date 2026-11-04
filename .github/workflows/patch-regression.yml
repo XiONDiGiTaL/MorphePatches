@@ -168,17 +168,21 @@ jobs:
 
       - name: Check the clone's application id in the patched APK
         if: steps.reference.outputs.available == 'true'
+        env:
+          CLONE_ID: app.xiondigital.tandem
         run: |
           set -euo pipefail
           # The report names the input package (net.tandem), so the rename has to be checked in the
           # output: a manifest that kept the original id would install over the user's Tandem.
+          # The manifest is binary XML, and its string pool is UTF-16 here, so plain grep on the
+          # bytes would miss the id; both encodings are accepted rather than pinning one.
           if ! unzip -p "$RUNNER_TEMP/tandem-6.38.0-patched.apk" AndroidManifest.xml \
-            | grep -qa "app.xiondigital.tandem"; then
+            | python3 -c 'import os, sys; d = sys.stdin.buffer.read(); i = os.environ["CLONE_ID"]; sys.exit(0 if i.encode("utf-16-le") in d or i.encode() in d else 1)'; then
             echo "::error::The patched APK does not carry the clone's application id."
             exit 1
           fi
 
-          echo "Clone application id: \`app.xiondigital.tandem\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Clone application id: \`$CLONE_ID\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the patch report
         if: always() && steps.reference.outputs.available == 'true'

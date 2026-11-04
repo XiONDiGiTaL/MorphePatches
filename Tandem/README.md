@@ -139,8 +139,10 @@ Lcom/pairip/licensecheck/LicenseActivity;->onStart()V                           
 in the patched build, launching still opens Play's licence paywall
 (`store/license/paywall?id=net.tandem`) and the process then dies with SIGSEGV inside
 `libpairipcore.so` — enforcement runs below the layer this patch edits. An unpatched sideloaded copy of
-the same APK behaves the same way, so the gate is the licence check rather than the patches. Details in
-[DEVICE-TEST.md](DEVICE-TEST.md).
+the same APK behaves the same way, so the gate is the app's protection rather than the patches.
+Unwrapping PairIP's application class and disabling Play were both tried on the device; neither
+changed the outcome — Tandem's own startup loads `libpairipcore.so` from `VMRunner`, and the native
+check kills the process. Details in [DEVICE-TEST.md](DEVICE-TEST.md).
 
 **Not touched.** PairIP's method-level protection (`VMRunner`, `StartupLauncher`) stays active, so the
 classes it decrypts at runtime still load. That runtime is why the licence activity is closed rather

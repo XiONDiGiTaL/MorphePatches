@@ -97,19 +97,50 @@ signature of enforcement happening **below** the patched layer — PairIP's nati
 decrypts at startup — rather than in the bytecode the patch edits. Emptying the Java methods does not
 remove the binding to Play's licensing service, and the native core terminates the process afterwards.
 
+## Attempts to get past it
+
+Two things were tried on the device. Neither helped, and neither is in the bundle.
+
+**1. Unwrapping PairIP's application class.** `com.pairip.application.Application` is a thin
+subclass of `net.tandem.TandemApp`, so the manifest's `android:name` was pointed at Tandem's own
+class — removing `attachBaseContext`, and with it the signature and licence checks — while keeping
+the dex stubs. The build installed and the installed manifest was confirmed to declare
+`net.tandem.TandemApp`, yet the launch behaved identically: the same paywall, and
+
+```
+D nativeloader: Load …/split_config.arm64_v8a.apk!/lib/arm64-v8a/libpairipcore.so
+                using class loader …/base.apk!classes2.dex
+F DEBUG : signal 11 (SIGSEGV) … #00 pc 00000000000330c4 …!libpairipcore.so
+```
+
+The library is loaded from `classes2.dex` — `com.pairip.VMRunner` — which Tandem's own startup
+reaches, so taking the wrapper out of the manifest does not take PairIP out of the process.
+
+**2. Removing Play from the equation.** With `com.android.vending` disabled
+(`pm disable-user --user 0 com.android.vending`), the licensing service cannot answer at all. The
+process still loaded `libpairipcore.so` and still died at the same `0x330c4`. So the kill is PairIP's
+native integrity check, not a reaction to Play saying "not licensed" — which is why stubbing the
+bytecode that talks to Play cannot fix it.
+
+Conclusion from both: the enforcement sits in `libpairipcore.so` (plus the classes it decrypts), and
+no dex or manifest patch reaches it. The prototype change was reverted, so the shipped bundle is
+byte-for-byte unchanged.
+
 ## What this means
 
 - The clone mechanics work: new application id, installs beside the official app, no provider or
   broadcast collisions on the device.
-- The bundle is **not usable on hardware yet**: it cannot get past Tandem's licence gate, which is the
-  same "Get this app from Google Play" behaviour reported before the clone patch existed.
+- The bundle is **not usable on hardware yet**: it cannot get past Tandem's licence and integrity
+  gate, which is the same "Get this app from Google Play" behaviour reported before the clone patch
+  existed. The gate is native, so this is not something a further dex patch can fix.
 - Nothing after launch has been observed — sign-in, messaging, dark mode, ad removal, voice notes — so
   none of those can be marked as verified.
 
 ## Next
 
-1. Neutralise the licence check at the level that actually runs (PairIP's native core / its decrypted
-   path), then repeat this test unchanged.
+1. Neutralise the checks inside `libpairipcore.so` itself — the SIGSEGV at offset `0x330c4` is the
+   place to start — or find a Tandem build without PairIP, then repeat this test unchanged. Morphe's
+   dex and manifest patches cannot reach it.
 2. Once a run survives launch, walk the app: sign-in, conversation list, a message, a call, then the
    patch-specific effects.
 3. Compare against a **Play-installed** official app; sideloading the stock APK trips the same gate, so

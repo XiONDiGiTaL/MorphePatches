@@ -39,6 +39,11 @@ import app.xiondigital.patches.tandem.shared.replaceBodyWithReturnVoid
  *
  * PairIP's method-level protection (`VMRunner`, `StartupLauncher`) is deliberately left intact, so
  * the classes it decrypts at runtime are still loaded normally.
+ *
+ * A device test on 2026-11-04 showed these stubs are not enough on their own: the launch still
+ * reaches Play's licence paywall and dies inside `libpairipcore.so`. See
+ * `Tandem/DEVICE-TEST.md` for the measurement, including the attempts that were tried and did not
+ * help.
  */
 @Suppress("unused")
 val bypassPairIpPatch = bytecodePatch(

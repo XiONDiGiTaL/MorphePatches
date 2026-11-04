@@ -117,12 +117,15 @@ jobs:
           set -euo pipefail
           mkdir -p build/ci
 
-          # No -e list: the run applies every patch the bundle enables by default, so a patch added
-          # to the sources cannot be left untested by a stale name list here.
+          # Patches that are on by default are applied by being enabled in the bundle, so a patch
+          # added to the sources cannot be left untested by a stale name list here.
+          # -e "Clone package": that patch is off by default (it changes which app gets installed),
+          #   but its ten dex literals are anchors too and have to be exercised on every push.
           # --validate: also fail if an anchor matches more than one method, which is how a silent
           #   rewrite of the wrong method would start.
           java -jar "$RUNNER_TEMP/morphe/$MORPHE_CLI_JAR" patch \
             -p "${{ steps.bundle.outputs.path }}" \
+            -e "Clone package" \
             --validate \
             -o "$RUNNER_TEMP/tandem-6.38.0-patched.apk" \
             -r build/ci/report.json \
@@ -137,7 +140,8 @@ jobs:
             and .packageName == "net.tandem"
             and .packageVersion == "6.38.0"
             and (.failedPatches | length) == 0
-            and (.appliedPatches | length) > 0
+            and (.appliedPatches | length) == 5
+            and (.appliedPatches | index("Clone package")) != null
             and all(.stepResults[]; .success == true)
           ' build/ci/report.json > /dev/null; then
             echo "::error::Morphe reported a failed or incomplete run; the patch log is in the run artifact."
@@ -161,6 +165,20 @@ jobs:
           path: ${{ steps.bundle.outputs.path }}
           retention-days: 14
           if-no-files-found: error
+
+      - name: Check the clone's application id in the patched APK
+        if: steps.reference.outputs.available == 'true'
+        run: |
+          set -euo pipefail
+          # The report names the input package (net.tandem), so the rename has to be checked in the
+          # output: a manifest that kept the original id would install over the user's Tandem.
+          if ! unzip -p "$RUNNER_TEMP/tandem-6.38.0-patched.apk" AndroidManifest.xml \
+            | grep -qa "app.xiondigital.tandem"; then
+            echo "::error::The patched APK does not carry the clone's application id."
+            exit 1
+          fi
+
+          echo "Clone application id: \`app.xiondigital.tandem\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload the patch report
         if: always() && steps.reference.outputs.available == 'true'

@@ -239,9 +239,11 @@ const-string v0, "app.xiondigital.tandem.fileprovider"
 ```
 
 A **Package name** option sets the id; it must be a valid, dotted application id and cannot be
-`net.tandem`. The manifest rewrites refuse to run on a package that is not `net.tandem`, and each of the
-ten literals must still be present in the dex, so an app update that stops referencing one of them fails
-the patch instead of shipping a clone whose authority or broadcasts point at the app it was cloned from.
+`net.tandem`. Morphe validates it before the patch runs: an invalid value is refused with a warning and
+the default is used, so this patch cannot produce a build that keeps the original id. The manifest
+rewrites also refuse a manifest that does not declare `net.tandem`, and each of the ten literals must
+still be present in the dex, so an app update that stops referencing one of them fails the patch instead
+of shipping a clone whose authority or broadcasts point at the app it was cloned from.
 
 **Left alone on purpose.** Tandem's own class descriptors (`Lnet/tandem/…;`), its kotlinx.serialization
 class names, its notification channel and group ids (Android already scopes those to the package), its
@@ -298,7 +300,7 @@ Reference file: APKMirror universal bundle
 | Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM — including the opt-in clone patch, whose result is checked for the clone's id in the manifest |
 | Clone package renames the installed app | Pass — applied to the reference APKM and the result decompiled: `package="app.xiondigital.tandem"`, all nine authorities, the signature permission and `WXEntryActivity`'s task affinity renamed, and all ten dex literals rewritten |
 | Package name option takes a custom id | Pass — patched with `packageName=dev.xion.tandem` and the manifest and all ten literals followed it |
-| Clone patch rejects the original id | Pass by construction — the option validator refuses `net.tandem` and any non-dotted id |
+| Clone patch rejects the original id | Pass — passing `packageName=net.tandem` logs `failed validation for packageName` and patches with the default id instead; no build can come out of this patch still called `net.tandem` |
 | Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
 | All 18 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
 | Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `onCreate()` starts with `setApplicationNightMode(2)` |

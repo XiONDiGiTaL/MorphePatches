@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.1...v1.0.2) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **patches:** close PairIP's licence screen and its kill switch ([4eca703](https://github.com/XiONDiGiTaL/MorphePatches/commit/4eca70381e8b3ade184f1f2639b4ef0c279cd3d0))
+
 ## [1.0.1](https://github.com/XiONDiGiTaL/MorphePatches/compare/v1.0.0...v1.0.1) (2026-11-03)
 
 Re-released: the first `patches-1.0.1.mpp` aborted at patch time and has been withdrawn.

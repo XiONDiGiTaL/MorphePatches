@@ -40,7 +40,7 @@ All four are enabled by default; each can be turned off individually in Morphe M
 | Patch | What it changes | Methods touched |
 | :--- | :--- | :--- |
 | [Force dark mode](#force-dark-mode) | Injects an app-level night-mode call at `TandemApp.onCreate()` | 1 (injected) |
-| [Bypass PairIP checks](#bypass-pairip-checks) | Empties PairIP's signature and licence checks | 2 |
+| [Bypass PairIP checks](#bypass-pairip-checks) | Empties PairIP's signature and licence checks, and closes the licence screen it falls back to | 6 |
 | [Remove ads](#remove-ads) | Empties Tandem's community-ad composable and the ad SDKs' load methods | 11 |
 | [Disable Adjust tracking](#disable-adjust-tracking) | Empties `Adjust.initSdk(...)` | 1 |
 
@@ -84,35 +84,58 @@ force-inverted.
 
 ### Bypass PairIP checks
 
-**Effect.** Lets a patched, re-signed build start at all. 6.38.0 is protected with PairIP: the
-manifest declares `com.pairip.application.Application`, whose `attachBaseContext` runs two gates
+**Effect.** Lets a patched, re-signed build start — and stay started. 6.38.0 is protected with PairIP:
+the manifest declares `com.pairip.application.Application`, whose `attachBaseContext` runs two gates
 before Tandem initialises.
 
 | Gate | What it does | Why a patched build trips it |
 | :--- | :--- | :--- |
 | `SignatureCheck.verifyIntegrity(context)` | Base64 SHA-256 of the APK signing certificate, compared to expected values | Any re-signed APK mismatches and throws `SignatureTamperedException("Apk signature is invalid.")` before the first activity |
-| `LicenseClient.checkLicense(context)` | Binds Play's licensing service via `LicenseActivity` | A sideloaded build cannot satisfy the licence response |
+| `LicenseClient.checkLicense(context)` | Binds Play's licensing service | A sideloaded build cannot satisfy the licence response |
 
-**Change.** Both bodies become a single instruction:
+The licence flow is not only a check. Behind it there is a screen and a kill switch, and reaching
+them at launch is what a Play prompt and an app that closes by itself look like:
+
+| Component | What it does |
+| :--- | :--- |
+| `LicenseClient.startPaywallActivity(PendingIntent)` | Fires the store listing Play's licensing response carries, then calls `closeApp()`: the user is thrown into Google Play and out of Tandem |
+| `LicenseClient.startErrorDialogActivity()` | The same for a soft failure |
+| `LicenseClient.scheduleAppShutdown()` | Arms a 30-second delayed exit, so a run that looks healthy first still terminates |
+| `LicenseActivity.onStart()` | Renders whichever of the two its intent asks for |
+
+**Change.** Five bodies become a single `return-void`, and the licence activity closes itself instead
+of drawing its dialog:
 
 ```smali
-.method public static verifyIntegrity(Landroid/content/Context;)V
+.method private startPaywallActivity(Landroid/app/PendingIntent;)V
+    return-void
+.end method
+
+.method public onStart()V              # LicenseActivity
+    invoke-virtual {p0}, Landroid/app/Activity;->finish()V
     return-void
 .end method
 ```
 
-Both are pure checks: `void` returns, no state other code reads, no other class calls them for a
-result.
+All five are `void` methods — no state other code reads and no caller expects a result — so emptying
+them cannot change how Tandem starts or talks to its servers. The activity is finished rather than
+emptied because an empty `onStart()` would leave an invisible window that never closes.
 
 **Anchors** (stock 6.38.0 `base.apk`, `classes2.dex`):
 
 ```smali
-Lcom/pairip/SignatureCheck;->verifyIntegrity(Landroid/content/Context;)V          # public static
-Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V # public static
+Lcom/pairip/SignatureCheck;->verifyIntegrity(Landroid/content/Context;)V              # public static
+Lcom/pairip/licensecheck/LicenseClient;->checkLicense(Landroid/content/Context;)V     # public static
+Lcom/pairip/licensecheck/LicenseClient;->startPaywallActivity(Landroid/app/PendingIntent;)V  # private
+Lcom/pairip/licensecheck/LicenseClient;->startErrorDialogActivity()V                  # private
+Lcom/pairip/licensecheck/LicenseClient;->scheduleAppShutdown()V                       # private
+Lcom/pairip/licensecheck/LicenseActivity;->onStart()V                                 # public
 ```
 
 **Not touched.** PairIP's method-level protection (`VMRunner`, `StartupLauncher`) stays active, so the
-classes it decrypts at runtime still load.
+classes it decrypts at runtime still load. That runtime is why the licence activity is closed rather
+than only skipped: code PairIP decrypts at startup cannot be reached by a dex fingerprint, but it can
+only put the prompt in front of the user through that one activity.
 
 This patch is on by default because nothing else can run without it: the re-sign every patcher
 performs is exactly what the signature check rejects.
@@ -214,9 +237,10 @@ Reference file: APKMirror universal bundle
 | Bundle loads via Morphe's `loadPatchesFromJar` | Pass |
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
 | Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all four patches complete; 11 classes rewritten |
+| Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM |
 | Injected night-mode call present in the patched dex | Pass — decompiles to `((UiModeManager) getSystemService("uimode")).setApplicationNightMode(2)` as the first statement of `onCreate()` |
 | All 14 anchor methods for the other three patches present in the stock dex | Pass — ad, PairIP and Adjust anchors match in `classes.dex`, `classes2.dex`, `classes4.dex` of the reference `base.apk` |
-| Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `onCreate()` starts with `setApplicationNightMode(2)` |
+| Patched dex contains the intended changes | Pass — decompiled: `verifyIntegrity`, `checkLicense`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown`, `initSdk`, `Ljhp;->a` and all ten ad load methods are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `onCreate()` starts with `setApplicationNightMode(2)` |
 | Unsupported versions rejected | Pass by construction — only 6.38.0 is declared |
 | Dark mode on screens, dialogs, navigation | **Not tested** — no device or emulator available |
 | Ad slot absence, login, messaging | **Not tested** — same reason |
@@ -233,8 +257,11 @@ experimental.
 - **Only night-aware UI changes.** Screens, WebViews or creatives that ignore `uiMode` look the same as
   they do with the system dark mode on.
 - **Rewarded ads stay** — by design, as described above.
-- **PairIP risk remains.** The checks that are bypassed are the two that break re-signed builds; a
+- **PairIP risk remains.** The signature check, the licence check and the licence UI are gone, but a
   future server-side integrity signal could still refuse a patched client.
+- **Signing is still not Play's.** The patched build is signed with the patcher's key, so Play's own
+  "installed by Play" checks and store updates will not recognise it; that is inherent to patching,
+  not something a patch can restore.
 
 ## Warnings
 
@@ -256,6 +283,27 @@ patch plus `shared/Constants.kt` for the compatibility declarations.
 The Morphe Gradle plugin is published only to GitHub Packages, which needs credentials even for public
 packages: export `GITHUB_ACTOR` and a `GITHUB_TOKEN` with `read:packages`, or set `gpr.user` /
 `gpr.key` in `~/.gradle/gradle.properties`.
+
+## Regression check
+
+[`patch-regression.yml`](../.github/workflows/patch-regression.yml) builds the bundle, applies every
+patch it advertises to the reference 6.38.0 APKM with Morphe's own patcher, and fails unless the run
+reports all of them applied. Morphe aborts on the first fingerprint that stops matching, so this is the
+check that `v1.0.0` and the first `v1.0.1` never ran. The patcher release is pinned by tag and SHA-256
+in the workflow.
+
+The reference APK is proprietary and is not committed. It is configured for this repository already:
+
+1. The APKM lives as a release asset in a **private** fixture repository, so it is never redistributed
+   with the patches.
+2. The repository variable `TANDEM_APKM_URL` points at that asset, and the secret `TANDEM_APKM_TOKEN`
+   holds a token that can read it. Neither value belongs in the workflow file.
+3. Its SHA-256 has to match [`.github/fixtures/net.tandem-6.38.0.apkm.sha256`](../.github/fixtures/net.tandem-6.38.0.apkm.sha256);
+   change that line only when the reference build itself changes. A different file fails the job with
+   a configuration error instead of patching the wrong build.
+
+Without the variable the job still builds the bundle and reports the apply step as skipped, which is
+also what happens on pull requests from forks, where the token is not available.
 
 ## Changelog
 

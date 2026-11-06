@@ -211,6 +211,37 @@ the native verifier accepts (Play-signed) or a PairIP-free build — not another
 3. Compare against a **Play-installed** official app; sideloading the stock APK trips the same gate, so
    it is not a usable baseline.
 
+## 6.12.0 — the same gate, a different message
+
+6.12.0 (versionCode 11503) was tried as a way around the launch failure above, because older Tandem
+builds are what still run for most people. It is **not** one. Measured on the reference APKM, split
+like the 6.38.0 one:
+
+| | 6.38.0 | 6.12.0 |
+| :--- | :--- | :--- |
+| Application class in the manifest | `com.pairip.application.Application` | the same |
+| PairIP components in the manifest | `LicenseActivity` | `LicenseActivity` and `LicenseContentProvider` (`net.tandem.com.pairip.licensecheck.LicenseContentProvider`) |
+| `lib/arm64-v8a/libpairipcore.so` | present | present, 527,472 bytes |
+| Licence entry points | `LicenseClient.checkLicense(Context)`, `startPaywallActivity`, `startErrorDialogActivity`, `scheduleAppShutdown` | `LicenseClient.connectToLicensingService()`, `checkLicenseInternal(IBinder)`, `LicenseActivity.showPaywallAndCloseApp()`, `showErrorDialog()` |
+| Signature gate | `SignatureCheck.verifyIntegrity(Context)` | the same |
+
+So a re-signed 6.12.0 is subject to the same signature and licence checks, and it ships the native
+core that produced the SIGSEGV above.
+
+**"Please update … from the Google Play store" is Tandem's own dialog, not Play's licensing.** The
+text is `string/Error.UpgradeMessage` — "Please update to the latest version of Tandem from the
+Google Play store. We've improved the chat experience …" (`0x7f130458` in 6.38.0, `0x7f130421` in
+6.12.0; 6.12.0 also carries `string/OutdatedAppText` with the App Store wording). A literal-constant
+scan of all five dex files in each base APK found no method that loads either id, and no dex string
+references the resource by name — so the code that raises that dialog is not in the dex the
+patches rewrite, which is why emptying the licence methods behind it does not remove it.
+
+What the bundle does about 6.12.0 is only declared support: `v1.1.1` applies all five patches to
+both reference APKMs (five applied, zero failed, `--validate` on), with the anchors that moved
+between the builds matched by something stable. That is an "applies" result, not a "runs on a
+device" result — 6.12.0 has not been installed yet, and nothing above suggests it would behave
+differently from 6.38.0.
+
 ## Note on the official copy
 
 At the start of the test `net.tandem` was installed on the device. After the clone install completed it

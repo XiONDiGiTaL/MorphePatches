@@ -89,7 +89,7 @@ match the app you selected. The SHA-256 of each asset is on its release page.
 
 | Where | What it is |
 | :--- | :--- |
-| [Release asset](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) | `patches-<version>.mpp` — the complete bundle, signed by the release workflow |
+| [Release asset](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) | `patches-<version>.mpp` — the complete bundle, built and attached by the release workflow |
 | [Patch source](https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches) | `patches-list.json` in this repository — what the add-source link reads |
 | [`Tandem/patches.mpp`](Tandem/patches.mpp) | Tandem-only bundle, for a direct import without the other app's patches |
 | [`AmazonAtoZ/patches.mpp`](AmazonAtoZ/patches.mpp) | A to Z-only bundle, same version and sources |

@@ -3,9 +3,11 @@
 Patches for **Tandem: Language exchange** (`net.tandem`) by XiONDiGiTaL, built for
 [Morphe](https://morphe.software).
 
-The patches ship compiled in this folder: **[`patches.mpp`](patches.mpp)**, and as the `v1.1.0`
-release asset. Import either file in Morphe Manager and patch a stock Tandem **6.38.0** or **6.12.0** APK or APKM —
-nothing else is needed, and no build step is required to use it.
+The patches ship in the repository's release bundle, `patches-<version>.mpp`, together with the
+Amazon A to Z patches. Import the
+[latest release](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) in Morphe Manager and
+patch a stock Tandem **6.38.0** or **6.12.0** APK or APKM — nothing else is needed, and no build step
+is required to use it.
 
 Adding `XiONDiGiTaL/MorphePatches` as a source
 (`https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches`) lists the same five patches
@@ -17,21 +19,16 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | [`v1.1.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.1.0) — `patches-1.1.0.mpp`, 74,124 bytes (2026-11-04) |
-| Bundle | [`patches.mpp`](patches.mpp) — 74,124 bytes (the same build as the release asset) |
-| SHA-256 | `0034159ee9a8ba74d7f540f2ca48f5c57cf4d805f68639da575d991e1f5f2af9` (both files) |
+| Release | the [latest](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) `patches-<version>.mpp` — one bundle for every app in this repository |
+| SHA-256 | listed on the release page next to the attached bundle |
 | Contents | 5 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking, Clone package |
 | Target | `net.tandem` — Tandem **6.38.0** (versionCode **11568**, minSdk 32) and **6.12.0** (versionCode **11503**, minSdk 26; the bundle needs API 31) |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |
 | Format | APK and APKM (compatibility entries for both) |
 | Status | **Experimental** — applies to the real 6.38.0 and 6.12.0 APKMs and the patched dex is verified; the first device test installs the clone but is stopped by Tandem's licence gate at launch ([DEVICE-TEST.md](DEVICE-TEST.md)) |
 
-Verify the download before importing:
-
-```bash
-sha256sum patches.mpp
-# 0034159ee9a8ba74d7f540f2ca48f5c57cf4d805f68639da575d991e1f5f2af9
-```
+Verify the download before importing — the release page lists the asset's size and SHA-256, so
+compare the file you saved against those two values.
 
 ## Patches in the bundle
 
@@ -285,7 +282,7 @@ local data is not migrated, and there is no supported way to copy it across with
 ## Install
 
 1. Use Tandem **6.38.0** (versionCode 11568) — APKM bundle or single APK.
-2. In Morphe Manager, either import [`patches.mpp`](patches.mpp) (or the [`v1.1.0`](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v1.1.0) asset), or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the five patches.
+2. In Morphe Manager, either import the [latest release](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) bundle, or add `XiONDiGiTaL/MorphePatches` as a patch source and let it list the five Tandem patches.
 3. Select your Tandem file. Keep **Bypass PairIP checks** enabled (a re-signed build will not start
    without it); enable the others as wanted.
 4. **Either** keep **Clone package** off and uninstall the stock app first — the result is signed
@@ -376,7 +373,7 @@ on hardware.
 ```bash
 # JDK 21, from the repository root
 ./gradlew :patches:buildAndroid
-# -> patches/build/libs/patches-*.mpp   (copy over Tandem/patches.mpp when it changes)
+# -> patches/build/libs/patches-*.mpp   (the release workflow attaches this)
 ```
 
 Patch sources live in `patches/src/main/kotlin/app/xiondigital/patches/tandem/` — one package per
@@ -408,6 +405,17 @@ Without the variable the job still builds the bundle and reports the apply step 
 also what happens on pull requests from forks, where the token is not available.
 
 ## Changelog
+
+### 0.1.0 — 2026-11-13 (baseline)
+
+The collection was renumbered onto a single 0.1.x line: every release now moves one patch number at
+a time (0.1.1, 0.1.2, ...) instead of a `feat:` commit bumping a minor and skipping the numbers in
+between.
+
+- No Tandem patch changed in this release. The bundle now carries both apps' patches, and each app
+documents its work in its own folder (`Tandem/` here, `AmazonAtoZ/` for A to Z).
+- The per-folder `Tandem/patches.mpp` copy was retired. The release asset is the one artifact to
+download, so a bundle in the repository can no longer drift from the released one.
 
 ### 1.1.1 — 2026-11-06
 

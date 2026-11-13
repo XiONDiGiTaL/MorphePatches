@@ -322,8 +322,8 @@ the same native check described in [DEVICE-TEST.md](DEVICE-TEST.md).
 | `:patches:buildAndroid` produces the bundle | Pass |
 | Bundle loads via Morphe's `loadPatchesFromJar` | Pass |
 | Metadata identifies `net.tandem`, 6.38.0, minSdk 32 | Pass |
-| Bundle applies to the APKMirror 6.38.0 APKM (fingerprint match + dex assembly) | Pass — all five patches complete; 20 classes rewritten |
-| Bundle applies to the APKMirror 6.12.0 APKM | Pass — applied with Morphe's patcher, five patches, zero failures, `--validate` on |
+| Published **0.1.0** bundle applies to the reference 6.38.0 APKM (fingerprint match + dex assembly) | Pass, re-run 2026-11-13 with the release asset itself: all five patches applied, `--validate` on, **20 of 36,279 classes** rewritten, and the patched manifest carries the clone id |
+| Published **0.1.0** bundle applies to 6.12.0 | **Not re-run** — the 6.12.0 reference file is not in the fixtures repository and APKMirror's download is bot-gated, so that build is still only verified against the bundle that shipped it (1.1.1) |
 | Patched 6.12.0 dex contains the intended changes | Pass — `verifyIntegrity`, `connectToLicensingService`, `showPaywallAndCloseApp`, `initSdk` and `Lcl3;->a` are a single `return-void`; `LicenseActivity.onStart()` is `finish()`; `TandemApp.onCreate()` gained the night-mode call |
 | Every patch applies in CI on each push | [`patch-regression.yml`](../.github/workflows/patch-regression.yml), against the pinned reference APKM — including the opt-in clone patch, whose result is checked for the clone's id in the manifest |
 | Clone package renames the installed app | Pass — applied to the reference APKM and the result decompiled: `package="app.xiondigital.tandem"`, all nine authorities, the signature permission and `WXEntryActivity`'s task affinity renamed, and all ten dex literals rewritten |
@@ -341,12 +341,21 @@ the same native check described in [DEVICE-TEST.md](DEVICE-TEST.md).
 The last rows decide whether this bundle is usable. It stays experimental until a build survives launch
 on hardware.
 
+The 2026-11-13 re-run used the published `patches-0.1.0.mpp` (99,685 bytes) against the reference APKM
+whose SHA-256 is `17539cc6…2e3ca`, with `--validate`, the clone patch enabled and all five patches
+applied: the patcher reported `success: true`, no failed patches, and wrote a 268,880,129-byte APK.
+The 6.12.0 half of the same run is the one gap above — that file is not on this machine and the
+fixtures repository holds only 6.38.0, so it needs to be supplied (or uploaded there) before it can be
+re-checked.
+
 ## Known limitations
 
 - **Does not launch on a device yet.** The 2026-11-04 hardware test installs the clone but Tandem's
   licence gate opens Google Play and the process dies inside `libpairipcore.so`; see
   [DEVICE-TEST.md](DEVICE-TEST.md). Every other result above is a check against the APK's own dex and
   resources, not screen behaviour.
+- **The Play prompt has no dex-level workaround.** See
+  [below](#why-the-play-prompt-cannot-be-patched-away).
 - **No in-app toggle.** Each patch is on or off at patch time; a runtime switch would need a settings
   destination and a persisted preference inside Tandem's settings architecture.
 - **Only night-aware UI changes.** Screens, WebViews or creatives that ignore `uiMode` look the same as
@@ -362,6 +371,34 @@ on hardware.
   with the official install, as described under [Clone package](#clone-package).
 - **A clone does not hide its origin.** The application id and icon differ, but the code, resources and
   network behaviour are Tandem's, so anything Tandem's servers decide from a client signal is unaffected.
+
+## Why the Play prompt cannot be patched away
+
+The launch failure is not a gap in the PairIP patch; it is what PairIP is for. The dex gates
+(`SignatureCheck.verifyIntegrity`, `LicenseClient.checkLicense`) are the part a patch can reach, and
+this bundle reaches them. They are not the whole check:
+
+| Layer | Where | What this bundle does | What remains |
+| :--- | :--- | :--- | :--- |
+| Certificate comparison | `classes2.dex` | `verifyIntegrity` reduced to `return-void` | — |
+| Licence client | `classes2.dex` | `checkLicense` reduced to `return-void` | The screen it falls back to still opens Play for an unlicensed package |
+| Native verifier | `libpairipcore.so` | nothing a dex patch can do | The 2026-11-04 run dies here, after the Play prompt |
+
+Morphe necessarily re-signs the APK it builds, and the re-signed certificate is exactly what PairIP
+tests for. A patch can silence the two Java checks, but it cannot make the package carry Play's
+signature, and the native verifier is not driven by the dex.
+
+That leaves three options, none of which is a patch change:
+
+1. **Modify the app without re-signing it** — keep the Play-installed package and hook at runtime
+   (root with an LSPosed-style loader). This is the only route that preserves the certificate, and it
+   is outside what Morphe produces; it also needs root, which the test device does not have.
+2. **A build without PairIP** — none of the builds inspected here qualify (6.12.0 and 6.38.0 both ship
+   `com.pairip.application.Application`), and Tandem's servers still refuse long-obsolete versions.
+3. **Use the unmodified app.**
+
+So the Tandem line stays **blocked at launch**: the patches are correct against the APK, and no later
+version of this bundle will change the outcome unless one of the first two conditions is met.
 
 ## Warnings
 

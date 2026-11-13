@@ -92,14 +92,26 @@ jobs:
           git config user.name "XiØN"
           git config user.email "53795273+XiONDiGiTaL@users.noreply.github.com"
           git add README.md CHANGELOG.md gradle.properties patches-list.json patches-stats.json patches-bundle.json
-          git commit -m "chore: Release v$VERSION [skip ci]"
-          git tag "v$VERSION"
-          git push origin "HEAD:${GITHUB_REF_NAME}" --follow-tags
+          if git diff --cached --quiet; then
+            # A re-run after a partial failure must not fail on "nothing to commit".
+            echo "Generated files already carry v$VERSION; nothing to commit."
+          else
+            git commit -m "chore: Release v$VERSION [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
 
-          gh release create "v$VERSION" \
-            --title "v$VERSION" \
-            --notes "Baseline release. One bundle, every supported app: five Tandem patches and two Amazon A to Z patches. Versions from here move by one patch at a time." \
-            "$BUNDLE"
+          # --follow-tags only pushes annotated tags and this one is lightweight, so name it explicitly.
+          git tag --force "v$VERSION"
+          git push origin "refs/tags/v$VERSION"
+
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            gh release upload "v$VERSION" "$BUNDLE" --clobber
+          else
+            gh release create "v$VERSION" \
+              --title "v$VERSION" \
+              --notes "Baseline release. One bundle, every supported app: five Tandem patches and two Amazon A to Z patches. Versions from here move by one patch at a time." \
+              "$BUNDLE"
+          fi
 
       - name: Attest
         uses: actions/attest-build-provenance@v4

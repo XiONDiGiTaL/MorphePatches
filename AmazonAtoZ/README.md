@@ -11,8 +11,8 @@ it.
 | Package | `com.amazon.atozm` |
 | Versions | any (no version list — the patches are offered for whatever build you supply) |
 | Input | APK (`arm64-v8a` for a 64-bit-only phone such as the Galaxy S25 Ultra) |
-| Bundle | [`patches.mpp`](patches.mpp) — 18,444 bytes, A to Z-only build at 0.1.0 |
-| SHA-256 | `b14c2b4996f9ff1348c44bfd64740541dd535a06dc99f044644d5b3106c7df1e` (this file) |
+| Bundle | [`patches.mpp`](patches.mpp) — A to Z-only, split from the release bundle by the release workflow |
+| Checksum | [`patches.mpp.sha256`](patches.mpp.sha256) — written with the bundle, so it cannot go stale |
 | Verified against | 6.0.5098.0 (60050982), and the same anchors exist in 6.0.3553.0, 6.0.2988.0 and 6.0.2065.0 |
 
 ## Why the app needs a patch for this

@@ -49,6 +49,11 @@ jobs:
 
           ./gradlew :patches:buildAndroid generatePatchesList -Pversion="$VERSION" --no-daemon
 
+          # Derive each app folder's bundle from the combined one, so the folders and the release can
+          # never disagree about what a version contains.
+          BUNDLE=$(ls -1 patches/build/libs/patches-*.mpp | grep -v -e sources -e javadoc | head -1)
+          python3 .github/scripts/split_app_bundles.py "$BUNDLE"
+
           # What release.yml does for a normal release: stamp the version into the generated files,
           # rebuild the README patch table from them, and keep gradle.properties in step so a local
           # build produces the same version as the last release.
@@ -92,6 +97,8 @@ jobs:
           git config user.name "XiØN"
           git config user.email "53795273+XiONDiGiTaL@users.noreply.github.com"
           git add README.md CHANGELOG.md gradle.properties patches-list.json patches-stats.json patches-bundle.json
+          git add Tandem/patches.mpp Tandem/patches.mpp.sha256
+          git add AmazonAtoZ/patches.mpp AmazonAtoZ/patches.mpp.sha256
           if git diff --cached --quiet; then
             # A re-run after a partial failure must not fail on "nothing to commit".
             echo "Generated files already carry v$VERSION; nothing to commit."

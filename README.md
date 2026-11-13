@@ -93,13 +93,16 @@ match the app you selected. The SHA-256 of each asset is on its release page.
 | [Patch source](https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches) | `patches-list.json` in this repository — what the add-source link reads |
 | [`Tandem/patches.mpp`](Tandem/patches.mpp) | Tandem-only bundle, for a direct import without the other app's patches |
 | [`AmazonAtoZ/patches.mpp`](AmazonAtoZ/patches.mpp) | A to Z-only bundle, same version and sources |
+
+Both per-app bundles are derived from the released bundle by the release workflow, so they cannot
+fall behind it. `.github/apps.json` is the list it works from.
 | `Tandem/`, `AmazonAtoZ/` | Documentation per app: what each patch changes, its anchors, its limits |
 | `patches/src/main/kotlin/app/xiondigital/patches/<app>/` | The patch sources, one package per app |
 
-Adding an app means a new folder, a new package under `patches/.../patches/`, a compatibility entry,
-and — if it should have a standalone file — the folder's own bundle built at the release version. The
-combined release asset, `patches-list.json`, the patch table below and the badges at the top are all
-regenerated from that at the next release.
+Adding an app means a new folder, a new package under `patches/.../patches/`, a compatibility entry
+and one line in `.github/apps.json`. The combined release asset, that folder's own bundle,
+`patches-list.json`, the patch table below and the badges at the top are all regenerated from that at
+the next release.
 
 The bundle declares `Patcher-Version: 2.1.0`. Import it in Morphe Manager, or point Morphe at the
 source link above and it lists the patches itself.

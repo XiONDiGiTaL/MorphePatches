@@ -11,6 +11,8 @@ it.
 | Package | `com.amazon.atozm` |
 | Versions | any (no version list — the patches are offered for whatever build you supply) |
 | Input | APK (`arm64-v8a` for a 64-bit-only phone such as the Galaxy S25 Ultra) |
+| Bundle | [`patches.mpp`](patches.mpp) — 18,444 bytes, A to Z-only build at 0.1.0 |
+| SHA-256 | `b14c2b4996f9ff1348c44bfd64740541dd535a06dc99f044644d5b3106c7df1e` (this file) |
 | Verified against | 6.0.5098.0 (60050982), and the same anchors exist in 6.0.3553.0, 6.0.2988.0 and 6.0.2065.0 |
 
 ## Why the app needs a patch for this
@@ -120,8 +122,9 @@ Data does not migrate between the two installs: the clone starts from a clean st
 
 ## Applying it
 
-In Morphe Manager, add this repository as a source (or import the release bundle), select your
-A to Z APK and keep **Force dark mode** enabled. Enable **Clone package** too if the patched build
+In Morphe Manager, add this repository as a source, or import
+[`patches.mpp`](patches.mpp) from this folder (A to Z only) or the combined release bundle (every
+app). Select your A to Z APK and keep **Force dark mode** enabled. Enable **Clone package** too if the patched build
 should sit beside the official app; its two options set the application id and the launcher name.
 
 From the CLI:

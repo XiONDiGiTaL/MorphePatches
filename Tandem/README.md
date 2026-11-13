@@ -19,8 +19,9 @@ review — live in a separate offline app, [Tandem Study](../companion/README.md
 
 | | |
 | :--- | :--- |
-| Release | the [latest](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) `patches-<version>.mpp` — one bundle for every app in this repository |
-| SHA-256 | listed on the release page next to the attached bundle |
+| Release | the [latest](https://github.com/XiONDiGiTaL/MorphePatches/releases/latest) `patches-<version>.mpp` — the combined bundle, every app's patches |
+| Bundle | [`patches.mpp`](patches.mpp) — 44,275 bytes, Tandem-only build at 0.1.0 |
+| SHA-256 | `78dcc007400e996b03adcbfc14a8b452997ee5c6c7dd75b2dd1922da2dad5357` (this file) |
 | Contents | 5 patches: Force dark mode, Bypass PairIP checks, Remove ads, Disable Adjust tracking, Clone package |
 | Target | `net.tandem` — Tandem **6.38.0** (versionCode **11568**, minSdk 32) and **6.12.0** (versionCode **11503**, minSdk 26; the bundle needs API 31) |
 | Patcher | Morphe patcher **2.1.0** (the bundle declares `Patcher-Version: 2.1.0`) |

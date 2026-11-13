@@ -39,9 +39,10 @@
 
 ### What ships here
 
-Six working patches for two apps, written against Morphe's patch API and shipped as a prebuilt bundle.
-Five are for **Tandem: Language exchange** 6.38.0; the sixth is a universal **Force dark mode** for
-**Amazon A to Z** (`com.amazon.atozm`) that applies to any version of the app. Each one is a real
+Seven working patches for two apps, written against Morphe's patch API and shipped as a prebuilt
+bundle. Five are for **Tandem: Language exchange** 6.38.0; the other two are for **Amazon A to Z**
+(`com.amazon.atozm`) and apply to any version of it: a universal **Force dark mode**, and an opt-in
+**Clone package** that installs the patched build under its own application id. Each one is a real
 change to the app's own code, documented down to the method it anchors on and the exact code it
 injects.
 
@@ -77,7 +78,7 @@ Applies to the stock APKM; device test 2026-11-04: installs, blocked at launch b
 | App | Package | Patches |
 | --- | --- | --- |
 | [Tandem](Tandem/README.md) | `net.tandem` | [Bypass PairIP checks](Tandem/README.md#bypass-pairip-checks) · [Force dark mode](Tandem/README.md#force-dark-mode) · [Remove ads](Tandem/README.md#remove-ads) · [Disable Adjust tracking](Tandem/README.md#disable-adjust-tracking) · [Clone package](Tandem/README.md#clone-package) (opt-in) — 6.38.0 only |
-| [Amazon A to Z](AtoZ/README.md) | `com.amazon.atozm` | [Force dark mode](AtoZ/README.md#force-dark-mode) — any version |
+| [Amazon A to Z](AtoZ/README.md) | `com.amazon.atozm` | [Force dark mode](AtoZ/README.md#force-dark-mode) · [Clone package](AtoZ/README.md#clone-package) (opt-in) — any version |
 
 Two copies of the same bundle — take either:
 
@@ -161,9 +162,11 @@ Or import a file directly: download either bundle above, open it in Morphe Manag
 locally — the `.mpp` in this repo is the finished artifact.
 
 For **Amazon A to Z**, any version works: select the APK (the arm64 build for a 64-bit-only phone
-such as a Galaxy S25 Ultra) and keep **Force dark mode** enabled. The patch only adds theme items and
-one call at the top of `MainApplication.onCreate()`; it does not rename the app, so the patched build
-replaces the installed A to Z.
+such as a Galaxy S25 Ultra) and keep **Force dark mode** enabled. That patch only adds theme items and
+one call at the top of `MainApplication.onCreate()`, so the patched build replaces the installed
+A to Z. Enable **Clone package** instead if you want it beside the official app: it gives the build
+its own application id, renames the provider authorities, runtime permission and launcher label with
+it, and drops the Amazon SDK permission declarations a re-signed build cannot own.
 
 <a href="https://morphe.software/add-source?github=XiONDiGiTaL/MorphePatches">
   <img src=".github/assets/add-to-morphe.svg" alt="Add to Morphe" height="48">

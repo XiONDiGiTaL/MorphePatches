@@ -1,15 +1,16 @@
-# Amazon A to Z — Force dark mode
+# Amazon A to Z — Force dark mode & Clone package
 
-A universal Morphe patch for **Amazon A to Z** (`com.amazon.atozm`). It turns the app dark regardless
-of the phone's theme, on **any version** of the app.
+Two universal Morphe patches for **Amazon A to Z** (`com.amazon.atozm`), both of which apply to **any
+version** of the app: **Force dark mode** turns the interface dark regardless of the phone's theme,
+and the opt-in **Clone package** installs the patched build beside the official app instead of over
+it.
 
 | | |
 |---|---|
-| Patch | `Force dark mode` |
+| Patches | `Force dark mode` (on by default) · `Clone package` (opt-in) |
 | Package | `com.amazon.atozm` |
-| Versions | any (no version list — the patch is offered for whatever build you supply) |
+| Versions | any (no version list — the patches are offered for whatever build you supply) |
 | Input | APK (`arm64-v8a` for a 64-bit-only phone such as the Galaxy S25 Ultra) |
-| Default | enabled |
 | Verified against | 6.0.5098.0 (60050982), and the same anchors exist in 6.0.3553.0, 6.0.2988.0 and 6.0.2065.0 |
 
 ## Why the app needs a patch for this
@@ -73,21 +74,70 @@ Only two things change, and neither is code the app ships in its UI bundle:
 
 In the 6.0.5098.0 run this came to **1 of 10,884 classes** made mutable and **1,325 values in 16
 files** re-encoded. The manifest, the application id, the JS bundle, every other dex and every native
-library are left as they were — the patch does not rename the app, so it replaces the installed
-A to Z rather than sitting beside it. For a clone, patch the APK and change the package id yourself;
-that is a separate job with its own provider-authority and permission consequences.
+library are left as they were — so on its own this patch replaces the installed A to Z. To keep both,
+enable **Clone package** as well.
+
+## Clone package
+
+Android identifies an installed app by the `package` attribute of its manifest, so installing beside
+the official app means taking over that identifier and everything the manifest derives from it:
+
+| What moves | Why |
+|---|---|
+| `package` → `app.xiondigital.atoz` (option) | The platform's app identity; two apps cannot share it. |
+| Six provider authorities | Device-wide names: `androidx-startup`, `firebaseinitprovider`, `imagepickerprovider`, `rnshare.fileprovider`, `fileprovider`, and the identity SDK's `CrossAppContextProvider.com.amazon.atozm`, which embeds the package instead of prefixing it. |
+| `com.amazon.atozm.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | The app's own runtime permission; AndroidX derives the same name from `getPackageName()` at runtime, so the declaration and its `<uses-permission>` must match. |
+| Launcher label → `A to Z (clone)` (option) | Two identical icons on one home screen is a usability bug. |
+
+No dex literal carries an authority — the libraries build them from `getPackageName()` — so the dex is
+untouched by this patch. The clone therefore composes cleanly with **Force dark mode**.
+
+What it must *remove*: the manifest inherits six permission **declarations** from Amazon's SDK
+manifests — `com.amazon.identity.permission.*`, `com.amazon.identity.auth.device.perm.*`,
+`com.amazon.dcp.*`, `com.amazon.appmanager.preload.permission.*`. An Amazon-signed app already owns
+those names, and Android refuses to install a build that redeclares one it cannot sign for
+(`INSTALL_FAILED_DUPLICATE_PERMISSION`). The declarations are dropped; the matching
+`<uses-permission>` entries stay and simply go ungranted. Every component that references those
+permissions is `exported=false`, so nothing else depends on them being declared. A `<permission>`
+that belongs to neither the app nor a known Amazon SDK aborts the patch rather than shipping a clone
+that will not install.
+
+### What a clone cannot carry over
+
+A new application id is a new app to everything that checks identity:
+
+- **Play services and FCM.** The clone gets its own registration, and the server's push targeting
+  still addresses the official package — notifications may be delayed or missing.
+- **Play Integrity / attestation.** Verdicts are bound to the package and signing certificate, so any
+  flow that requires one will fail.
+- **Verified App Links.** The manifest still claims `atozmobileauth`, `atozmobile` and
+  `atozmobilelogout`, and the A to Z web flows still redirect to those schemes — but an App Link
+  verified against the official package will open the official app when both are installed.
+- **Amazon backend package checks.** Sign-in goes through the browser and returns by scheme, so it
+  can work; a server-side comparison against `com.amazon.atozm` would not, and cannot be tested here.
+
+Data does not migrate between the two installs: the clone starts from a clean state.
 
 ## Applying it
 
 In Morphe Manager, add this repository as a source (or import the release bundle), select your
-A to Z APK and keep **Force dark mode** enabled.
+A to Z APK and keep **Force dark mode** enabled. Enable **Clone package** too if the patched build
+should sit beside the official app; its two options set the application id and the launcher name.
 
 From the CLI:
 
 ```bash
+# dark mode only, replacing the installed app
 java -jar morphe-desktop.jar patch \
   --patches=patches.mpp \
   --exclusive -e "Force dark mode" \
+  your-atoz.apk
+
+# dark mode plus a clone that installs beside it
+java -jar morphe-desktop.jar patch \
+  --patches=patches.mpp \
+  --exclusive -e "Force dark mode" -e "Clone package" \
+  -OpackageName=app.xiondigital.atoz -OappName="A to Z (clone)" \
   your-atoz.apk
 ```
 
@@ -103,7 +153,12 @@ java -jar morphe-desktop.jar patch \
   `AppTheme.Launcher`, with the launcher parent reparented from `DayNight` to `Light`;
 - the manifest still declares `com.amazon.atozm`.
 
-It has **not** been run on a device. The rendered result is therefore unverified, and the usual Force
+With **Clone package** enabled as well, the same run produced a manifest that declares
+`app.xiondigital.atoz`, carries all six authorities renamed (including the identity SDK's embedded
+one), keeps the app's runtime permission under the new prefix, contains no foreign Amazon permission
+declarations, and labels the launcher `A to Z (clone)`.
+
+Neither patch has been run on a device. The rendered result is therefore unverified, and the usual Force
 Dark caveats apply: images and avatars are transformed along with everything else, so photos may look
 dimmed. If the app is ever updated to a build whose themes or `MainApplication` change shape, the
 patch fails loudly instead of silently doing nothing.

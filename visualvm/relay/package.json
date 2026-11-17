@@ -1,0 +1,14 @@
+{
+  "name": "visualvm-relay",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "vvm-relay.mjs",
+  "scripts": {
+    "start": "node vvm-relay.mjs"
+  },
+  "dependencies": {
+    "imapflow": "^1.0.193",
+    "mailparser": "^3.7.2"
+  }
+}

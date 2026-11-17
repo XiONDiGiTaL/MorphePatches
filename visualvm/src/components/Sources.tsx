@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import type { GmailConfig, RelayConfig } from '../types';
+import { exportInbox, restoreInbox, saveBlob } from '../lib/backup';
 import { Icon } from './Icons';
 
 type Counts = {
@@ -21,6 +22,7 @@ type Props = {
   gmailBusy: boolean;
   gmailProgress: string | null;
   onImport: () => void;
+  onRestored: () => Promise<void>;
   counts: Counts;
 };
 
@@ -35,6 +37,7 @@ export function Sources({
   gmailBusy,
   gmailProgress,
   onImport,
+  onRestored,
   counts,
 }: Props) {
   const [relayStatus, setRelayStatus] = useState<string | null>(null);
@@ -42,6 +45,11 @@ export function Sources({
   const [gmailStatus, setGmailStatus] = useState<string | null>(null);
   const [gmailError, setGmailError] = useState<string | null>(null);
   const [showSetup, setShowSetup] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [backupLabel, setBackupLabel] = useState<string | null>(null);
+  const [backupStatus, setBackupStatus] = useState<string | null>(null);
+  const [backupError, setBackupError] = useState<string | null>(null);
 
   async function sync() {
     setRelayError(null);
@@ -60,6 +68,60 @@ export function Sources({
       setGmailStatus(await onGmailImport());
     } catch (caught) {
       setGmailError(caught instanceof Error ? caught.message : String(caught));
+    }
+  }
+
+  async function exportAll() {
+    setBackupError(null);
+    setBackupStatus(null);
+    setBackupBusy(true);
+    setBackupLabel('Collecting messages');
+    try {
+      const { blob, summary } = await exportInbox((label, progress) => {
+        setBackupLabel(`${label} ${Math.round(progress * 100)}%`);
+      });
+      saveBlob(blob, summary.name);
+      const audioNote = summary.withAudio
+        ? ` with ${summary.withAudio} audio file${summary.withAudio === 1 ? '' : 's'}`
+        : ' without audio';
+      setBackupStatus(`Saved ${summary.voicemails} voicemail${summary.voicemails === 1 ? '' : 's'}${audioNote} as ${summary.name}`);
+    } catch (caught) {
+      setBackupError(caught instanceof Error ? caught.message : String(caught));
+    } finally {
+      setBackupBusy(false);
+      setBackupLabel(null);
+    }
+  }
+
+  async function restorePicked(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setBackupError(null);
+    setBackupStatus(null);
+    setBackupBusy(true);
+    setBackupLabel('Reading backup');
+    try {
+      const summary = await restoreInbox(file, (label, progress) => {
+        setBackupLabel(`${label} ${Math.round(progress * 100)}%`);
+      });
+      await onRestored();
+
+      if (!summary.added) {
+        setBackupStatus(`Nothing new in that backup, all ${summary.skipped} messages are already here`);
+        return;
+      }
+      const audioNote = summary.audio
+        ? ` with ${summary.audio} audio file${summary.audio === 1 ? '' : 's'}`
+        : '';
+      const skippedNote = summary.skipped ? `, skipped ${summary.skipped} already here` : '';
+      setBackupStatus(`Restored ${summary.added} voicemail${summary.added === 1 ? '' : 's'}${audioNote}${skippedNote}`);
+    } catch (caught) {
+      setBackupError(caught instanceof Error ? caught.message : String(caught));
+    } finally {
+      setBackupBusy(false);
+      setBackupLabel(null);
     }
   }
 
@@ -238,12 +300,46 @@ export function Sources({
             Add files
           </button>
         </section>
+
+        <section className="card source-card">
+          <div className="source-top">
+            <span className="source-icon">
+              <Icon name="download" size={20} />
+            </span>
+            <div>
+              <h3>Backup</h3>
+              <p className="hint">{counts.total} in this inbox</p>
+            </div>
+          </div>
+          <p>
+            Save every message with its audio as one zip. Restore it after clearing site data, after a
+            reinstall, or on a new phone. Restoring only adds what is missing, so it never overwrites what
+            is already here.
+          </p>
+          <button
+            type="button"
+            className="btn"
+            onClick={exportAll}
+            disabled={backupBusy || !counts.total}
+          >
+            <Icon name="download" size={16} />
+            Export inbox
+          </button>
+          <button type="button" className="btn" onClick={() => fileRef.current?.click()} disabled={backupBusy}>
+            <Icon name="import" size={16} />
+            Restore from file
+          </button>
+          <input ref={fileRef} type="file" accept=".zip,application/zip" hidden onChange={restorePicked} />
+          {backupStatus && <p className="banner ok">{backupStatus}</p>}
+          {backupError && <p className="banner error">{backupError}</p>}
+          {backupBusy && backupLabel && <p className="hint">{backupLabel}</p>}
+        </section>
       </div>
 
       <div className="sources-foot">
         <span className="micro">{counts.total} voicemails on this device</span>
         <p className="hint">
-          Clearing site data removes this inbox. Use download on a message to keep a copy elsewhere.
+          Clearing site data removes this inbox. Export it from Backup first and you can restore it later.
         </p>
       </div>
     </div>

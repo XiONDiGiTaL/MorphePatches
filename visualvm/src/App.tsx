@@ -134,6 +134,14 @@ export default function App() {
     setSelectedId((current) => (current === id ? (rows[0]?.id ?? null) : current));
   }
 
+  async function reloadInbox() {
+    const rows = await db.listVoicemails();
+    setItems(rows);
+    setSelectedId((current) =>
+      current && rows.some((row) => row.id === current) ? current : (rows[0]?.id ?? null),
+    );
+  }
+
   function openVoicemail(id: string) {
     setSelectedId(id);
     const row = (items ?? []).find((item) => item.id === id);
@@ -431,6 +439,7 @@ export default function App() {
           gmailBusy={gmailBusy}
           gmailProgress={gmailProgress}
           onImport={() => setImportOpen(true)}
+          onRestored={reloadInbox}
           counts={sourceCounts}
         />
       )}

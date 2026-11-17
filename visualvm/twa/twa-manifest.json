@@ -1,0 +1,42 @@
+{
+  "packageId": "net.xiondigital.visualvm",
+  "host": "xiondigital.net",
+  "name": "visualvm",
+  "launcherName": "visualvm",
+  "display": "standalone",
+  "themeColor": "#050607",
+  "themeColorDark": "#050607",
+  "navigationColor": "#050607",
+  "navigationColorDark": "#050607",
+  "navigationDividerColor": "#050607",
+  "navigationDividerColorDark": "#050607",
+  "backgroundColor": "#050607",
+  "enableNotifications": false,
+  "startUrl": "/visualvm/",
+  "fullScopeUrl": "https://xiondigital.net/visualvm/",
+  "webManifestUrl": "https://xiondigital.net/visualvm/manifest.webmanifest",
+  "iconUrl": "https://xiondigital.net/visualvm/icon-512.png",
+  "maskableIconUrl": "https://xiondigital.net/visualvm/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "fallbackType": "customtabs",
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersion": "1.0.0",
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "generatorApp": "bubblewrap-cli"
+}

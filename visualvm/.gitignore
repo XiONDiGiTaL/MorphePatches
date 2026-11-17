@@ -4,3 +4,11 @@ dist
 .DS_Store
 .env
 .env.local
+
+# TWA signing material and build artifacts stay local.
+android.keystore
+*.keystore
+*.jks
+*.apk
+*.aab
+app-release*

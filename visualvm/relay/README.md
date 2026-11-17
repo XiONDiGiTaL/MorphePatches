@@ -34,7 +34,7 @@ Then in the app: **Sources → Your carrier number**, paste
   standard). Many do; some don't, and some expose it only to their own app with
   app-specific credentials.
 - Carriers that pack the audio into a proprietary binary body instead of a MIME
-  audio part will be skipped — the relay only forwards parts it can identify.
+  audio part will be skipped. The relay only forwards parts it can identify.
 - Keep it on your own network. Do not expose it to the internet without TLS and
   a real token.
 - Google Voice is not covered here. Use the Takeout import instead; there is no

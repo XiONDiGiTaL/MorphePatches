@@ -403,7 +403,7 @@ export default function App() {
                 </h2>
                 <p>
                   Import a Google Voice export, sync a carrier mailbox through the relay, or drop in audio
-                  files. Everything is transcribed on this device — nothing gets uploaded.
+                  files. Everything is transcribed on this device. Nothing gets uploaded.
                 </p>
                 <div className="empty-actions">
                   <button type="button" className="btn btn-primary" onClick={() => setImportOpen(true)}>

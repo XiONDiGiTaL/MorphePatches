@@ -1,5 +1,5 @@
 :root {
-  /* XiØN design tokens — mirrored from manager/res/values/colors_xion.xml */
+  /* XiØN design tokens, mirrored from manager/res/values/colors_xion.xml */
   --bg: #050607;
   --bg-raised: #0a0b0d;
   --panel: #0c0e11;
@@ -23,7 +23,7 @@
   --danger: #ed8483;
   --danger-soft: rgba(237, 132, 131, 0.12);
 
-  /* Radius scale — 14 / 20 / 26 / pill */
+  /* Radius scale: 14 / 20 / 26 / pill */
   --r-sm: 14px;
   --r-md: 20px;
   --r-lg: 26px;
@@ -381,7 +381,7 @@ em {
   border-right: 1px solid var(--line);
 }
 
-/* Hero card — the 148dp Shizuku-style status block */
+/* Hero card: the 148dp Shizuku-style status block */
 .hero {
   position: relative;
   flex: none;
@@ -854,7 +854,7 @@ em {
   border-color: #3a4050;
 }
 
-/* Listen card — shown when the message arrived without audio */
+/* Listen card: shown when the message arrived without audio */
 .listen-card {
   display: flex;
   align-items: center;

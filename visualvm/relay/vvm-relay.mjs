@@ -4,7 +4,7 @@
  *
  * Bridges the carrier visual-voicemail mailbox (OMTP VVM is delivered over IMAP)
  * to the JSON shape the web app syncs. A browser cannot open an IMAP connection,
- * so this has to run somewhere that can — a laptop, a NAS, a Raspberry Pi.
+ * so this has to run somewhere that can: a laptop, a NAS, a Raspberry Pi.
  *
  *   IMAP_HOST=imap.example.com \
  *   IMAP_USER=5551234567 \
@@ -161,5 +161,5 @@ const server = http.createServer(async (request, response) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`VVM relay listening on http://0.0.0.0:${PORT} (mailbox: ${MAILBOX})`);
-  if (!TOKEN) console.warn('VVM_TOKEN is unset — the relay is open to anyone who can reach it.');
+  if (!TOKEN) console.warn('VVM_TOKEN is unset, so the relay is open to anyone who can reach it.');
 });

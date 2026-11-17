@@ -69,7 +69,7 @@ export function Sources({
         <span className="micro">Sources</span>
         <h2>Where your voicemail comes from</h2>
         <p className="lede">
-          This inbox lives on your device. There is no account of ours, no server of ours, and no upload —
+          This inbox lives on your device. There is no account of ours, no server of ours, and no upload:
           audio and transcripts sit in your browser's local storage.
         </p>
       </header>
@@ -87,7 +87,7 @@ export function Sources({
           </div>
           <p>
             Turn on <em>Get voicemail via email</em> in Google Voice settings, then pull the notifications
-            straight out of Gmail. Transcript, caller, date and length come with them — no Takeout export,
+            straight out of Gmail. Transcript, caller, date and length come with them, no Takeout export,
             and it only fetches new ones after the first run.
           </p>
 
@@ -143,7 +143,7 @@ export function Sources({
 
           {gmailStatus && <p className="banner ok">{gmailStatus}</p>}
           {gmailError && <p className="banner error">{gmailError}</p>}
-          {gmailBusy && <p className="hint">Approve the Google prompt in a proper browser tab — popups are blocked inside app frames.</p>}
+          {gmailBusy && <p className="hint">Approve the Google prompt in a proper browser tab. Popups are blocked inside app frames.</p>}
         </section>
 
         <section className="card source-card">
@@ -158,7 +158,7 @@ export function Sources({
           </div>
           <p>
             The archive route, and the only one that brings the actual recordings. Export Voice from Takeout
-            once and import the zip — audio, caller, date and Google's transcript all come along.
+            once and import the zip. Audio, caller, date and Google's transcript all come along.
           </p>
           <ol className="steps">
             <li>

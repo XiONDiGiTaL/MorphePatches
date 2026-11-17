@@ -90,7 +90,7 @@ function render(size, contentScale) {
   const half = (size * contentScale) / 2;
   const radius = half * 0.44;
 
-  // Five bars, tallest in the middle — a voicemail waveform.
+  // Five bars, tallest in the middle: a voicemail waveform.
   const barWidth = half * 0.12;
   const barGap = half * 0.09;
   const heights = [0.42, 0.72, 1, 0.72, 0.42];

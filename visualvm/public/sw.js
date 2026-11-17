@@ -1,4 +1,4 @@
-/* visualvm service worker — app shell only. */
+/* visualvm service worker. App shell only. */
 const CACHE = 'visualvm-shell-v1';
 
 // The worker lives at "<scope>sw.js", so its own path gives the app root at

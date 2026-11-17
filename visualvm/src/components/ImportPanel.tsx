@@ -84,7 +84,7 @@ export function ImportPanel({ onClose, onImported }: Props) {
           <Icon name="import" size={26} />
           <strong>{busy ? 'Working…' : 'Drop audio files or a Takeout .zip'}</strong>
           <span className="hint">
-            MP3, M4A, WAV, OGG, AMR — plus the matching .html files if you have them. Nothing is uploaded.
+            MP3, M4A, WAV, OGG, AMR, plus the matching .html files if you have them. Nothing is uploaded.
           </span>
         </div>
 

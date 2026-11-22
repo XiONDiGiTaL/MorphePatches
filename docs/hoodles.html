@@ -131,6 +131,7 @@
             <div class="card__tags" style="margin-top: 16px; padding-top: 0;">
               <span class="chip chip--blue chip--dot">GPLv3 — his license</span>
               <span class="chip">Source only</span>
+              <span class="chip">No bundle yet</span>
               <span class="chip">v1.47.0</span>
               <span class="chip">Temporary</span>
             </div>
@@ -145,13 +146,18 @@
                 <tr><th scope="row">Original</th><td><code class="inline-code">github.com/hoo-dles/morphe-patches</code> — removed</td></tr>
                 <tr><th scope="row">License</th><td>GNU GPLv3, retained in <code class="inline-code">hoodles/LICENSE</code></td></tr>
                 <tr><th scope="row">Release</th><td>1.47.0 · 2026-10-04 · 597 commits</td></tr>
-                <tr><th scope="row">Build</th><td><code class="inline-code">cd hoodles &amp;&amp; ./gradlew :patches:buildAndroid</code></td></tr>
+                <tr><th scope="row">Build</th><td><code class="inline-code">scripts/hoodles-build.sh</code> — run by the <code class="inline-code">hoodles:bundle</code> CI job</td></tr>
               </tbody>
             </table>
             <p class="panel__note">
-              The bundle lands at <code class="inline-code">hoodles/patches/build/libs/patches-1.47.0.mpp</code>.
-              Once it is placed in the mirror, his patches are addable to Morphe as their own source,
-              alongside the XiØN source — Morphe keeps one bundle per source, so the two are added separately.
+              <strong>Status: not live yet.</strong> The mirror carries his sources and the build that
+              produces the bundle, not a bundle. <code class="inline-code">scripts/hoodles-build.sh</code>
+              builds <code class="inline-code">hoodles/patches-1.47.0.mpp</code>, records its SHA-256 in
+              <code class="inline-code">hoodles/source.json</code>, and the
+              <code class="inline-code">hoodles:bundle</code> CI job publishes the two in that order — the
+              bundle first, then the source, each re-downloaded and hash-checked. Until that job has run
+              there is no <code class="inline-code">hoodles/source.json</code>, so his patches
+              <strong>cannot be added as a source</strong>, and this page will not pretend otherwise.
             </p>
           </div>
         </div>
@@ -285,23 +291,29 @@
           <div class="step">
             <span class="step__num">STEP 02</span>
             <div>
-              <h3 class="step__title">Build his bundle once</h3>
+              <h3 class="step__title">The mirror builds it, not you</h3>
               <p class="step__copy">
-                His release asset is gone, so build it from the mirror:
-                <code class="inline-code">cd hoodles &amp;&amp; ./gradlew :patches:buildAndroid</code>.
-                It needs JDK 17 and the Android SDK, exactly as his repository did.
+                His release asset is gone. A CI job,
+                <code class="inline-code">hoodles:bundle</code>, runs
+                <code class="inline-code">scripts/hoodles-build.sh</code> — JDK 17, Android SDK 36, and a
+                GitHub token with <code class="inline-code">read:packages</code> for Morphe's Gradle
+                registry — and commits the result. There is nothing to do on your side; if it has not run
+                yet, the next step is not possible.
               </p>
             </div>
           </div>
           <div class="step">
             <span class="step__num">STEP 03</span>
             <div>
-              <h3 class="step__title">Add his patches as a second source</h3>
+              <h3 class="step__title">Add his patches as a second source — once it exists</h3>
               <p class="step__copy">
-                Place the bundle at <code class="inline-code">hoodles/patches-1.47.0.mpp</code>, add a
-                <code class="inline-code">hoodles/patches-bundle.json</code> whose
-                <code class="inline-code">download_url</code> points at that file, and add that JSON as a
-                Remote source. Morphe asks which source to use when both have patches for an app.
+                When the job has published the bundle, open <strong>Sources → + → Remote</strong> and paste
+                <code class="inline-code">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/source.json</code>.
+                <br>
+                That file does not exist yet, so his patches are <strong>not addable today</strong>: the
+                URL returns 404 until the build has run. Morphe keeps one bundle per source, so his
+                collection stays its own source beside the XiØN one; when both have patches for an app,
+                Morphe asks which source to use.
               </p>
             </div>
           </div>

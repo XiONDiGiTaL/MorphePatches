@@ -535,7 +535,7 @@
             <div class="card__tags" style="margin-top: 16px; padding-top: 0;">
               <span class="chip chip--blue chip--dot">GPLv3</span>
               <span class="chip">Source only</span>
-              <span class="chip">No bundle yet</span>
+              <span class="chip" data-hoodles-chip>Checking bundle…</span>
               <span class="chip">Temporary</span>
             </div>
             <p style="margin-top: 16px;">
@@ -549,7 +549,7 @@
               <tbody>
                 <tr><th scope="row">Mirror</th><td><a class="text-link" href="https://gitgud.io/xiondigital/MorphePatches/-/tree/main/hoodles">gitgud.io/xiondigital/MorphePatches/hoodles ↗</a></td></tr>
                 <tr><th scope="row">Author</th><td>hoodles — GPLv3, v1.47.0</td></tr>
-                <tr><th scope="row">Bundle</th><td>Not published — <code class="inline-code">scripts/hoodles-build.sh</code> builds it in CI</td></tr>
+                <tr><th scope="row">Bundle</th><td><span data-hoodles-bundle>Checking…</span> — <code class="inline-code">scripts/hoodles-build.sh</code> builds it in CI</td></tr>
                 <tr><th scope="row">GitGud source</th><td><code class="inline-code" id="gitgud-source">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/patches-bundle.json</code></td></tr>
               </tbody>
             </table>
@@ -561,10 +561,8 @@
               <strong>+ Add to Morphe</strong> copies the GitGud source link. Morphe's add-source link
               only accepts github.com and gitlab.com, so paste it in
               <strong>Sources → + → Remote</strong> and tap Add. It serves the XiØN bundle hosted on
-              GitGud. His patches are <strong>not a source yet</strong>:
-              <code class="inline-code">hoodles/source.json</code> is only committed after CI has built the
-              bundle and confirmed it downloads with a matching SHA-256, so there is nothing to add until
-              that has run.
+              GitGud. <span data-hoodles-note>Whether his patches are also published as their own source
+              is checked live on <a class="text-link" href="hoodles.html">the Hoodles page ↗</a>.</span>
             </p>
           </div>
         </div>
@@ -612,6 +610,7 @@
   </footer>
 </div>
 
+<script src="hoodles-status.js"></script>
 <script>
   document.querySelectorAll("[data-copy]").forEach(function (button) {
     button.addEventListener("click", function () {

@@ -131,7 +131,7 @@
             <div class="card__tags" style="margin-top: 16px; padding-top: 0;">
               <span class="chip chip--blue chip--dot">GPLv3 — his license</span>
               <span class="chip">Source only</span>
-              <span class="chip">No bundle yet</span>
+              <span class="chip" data-hoodles-chip>Checking bundle…</span>
               <span class="chip">v1.47.0</span>
               <span class="chip">Temporary</span>
             </div>
@@ -150,14 +150,17 @@
               </tbody>
             </table>
             <p class="panel__note">
-              <strong>Status: not live yet.</strong> The mirror carries his sources and the build that
-              produces the bundle, not a bundle. <code class="inline-code">scripts/hoodles-build.sh</code>
-              builds <code class="inline-code">hoodles/patches-1.47.0.mpp</code>, records its SHA-256 in
+              <strong data-hoodles-headline>Status: checking whether the bundle is published…</strong>
+              <span data-hoodles-status>That line is filled in from GitGud when this page loads; with
+              JavaScript off it stays as it is, so open the source link in step 03 to check.</span>
+              <br>
+              <code class="inline-code">scripts/hoodles-build.sh</code> builds
+              <code class="inline-code">hoodles/patches-1.47.0.mpp</code>, records its SHA-256 in
               <code class="inline-code">hoodles/source.json</code>, and the
-              <code class="inline-code">hoodles:bundle</code> CI job publishes the two in that order — the
-              bundle first, then the source, each re-downloaded and hash-checked. Until that job has run
-              there is no <code class="inline-code">hoodles/source.json</code>, so his patches
-              <strong>cannot be added as a source</strong>, and this page will not pretend otherwise.
+              <code class="inline-code">hoodles:bundle</code> CI job publishes the two in that order —
+              the bundle first, then the source, each re-downloaded and hash-checked. That order is why
+              a source pointing at a missing bundle cannot appear. Whether it has run is not written
+              down here; it is checked against GitGud every time the page loads.
             </p>
           </div>
         </div>
@@ -305,15 +308,16 @@
           <div class="step">
             <span class="step__num">STEP 03</span>
             <div>
-              <h3 class="step__title">Add his patches as a second source — once it exists</h3>
+              <h3 class="step__title">Add his patches as a second source</h3>
               <p class="step__copy">
-                When the job has published the bundle, open <strong>Sources → + → Remote</strong> and paste
-                <code class="inline-code">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/source.json</code>.
+                <code class="inline-code" id="hoodles-source">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/source.json</code>
                 <br>
-                That file does not exist yet, so his patches are <strong>not addable today</strong>: the
-                URL returns 404 until the build has run. Morphe keeps one bundle per source, so his
-                collection stays its own source beside the XiØN one; when both have patches for an app,
-                Morphe asks which source to use.
+                <button class="btn btn--ghost btn--sm" type="button" data-copy="#hoodles-source" style="margin-top: 10px;">Copy source link</button>
+              </p>
+              <p class="step__copy" style="margin-top: 12px;" data-hoodles-step>
+                Whether that link resolves is checked when this page loads. Morphe keeps one bundle per
+                source, so his collection stays its own source beside the XiØN one; when both have
+                patches for an app, Morphe asks which source to use.
               </p>
             </div>
           </div>
@@ -360,6 +364,7 @@
   </footer>
 </div>
 
+<script src="hoodles-status.js"></script>
 <script>
   document.querySelectorAll("[data-copy]").forEach(function (button) {
     button.addEventListener("click", function () {

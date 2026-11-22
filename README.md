@@ -136,7 +136,7 @@ not do.
 ### Generated patch list
 
 <!-- PATCHES_START EXPANDED -->
-> **[v0.1.0](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v0.1.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;7 patches total
+> **[v0.1.1](https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v0.1.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;7 patches total
 <details open>
 <summary>📦 Tandem: Language exchange&nbsp;&nbsp;•&nbsp;&nbsp;5 patches</summary>
 <br>

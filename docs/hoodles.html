@@ -21,6 +21,7 @@
   .hoodles-table th[scope="row"] code { font-weight: 400; color: var(--muted); }
   .hoodles-table td { vertical-align: top; font-size: 0.86rem; line-height: 1.55; }
   .hoodles-credit { display: grid; gap: 0.7rem; }
+  .btn.is-disabled { opacity: 0.45; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -147,6 +148,7 @@
                 <tr><th scope="row">License</th><td>GNU GPLv3, retained in <code class="inline-code">hoodles/LICENSE</code></td></tr>
                 <tr><th scope="row">Release</th><td>1.47.0 · 2026-10-04 · 597 commits</td></tr>
                 <tr><th scope="row">Build</th><td><code class="inline-code">scripts/hoodles-build.sh</code> — run by the <code class="inline-code">hoodles:bundle</code> CI job</td></tr>
+                <tr><th scope="row">Add link</th><td><a class="text-link" href="https://morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches&amp;name=hoodles">morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches ↗</a><br><code class="inline-code">gitlab.com/XiONDiGiTaL/hoodles-morphe-patches</code> — metadata only</td></tr>
               </tbody>
             </table>
             <p class="panel__note">
@@ -270,11 +272,12 @@
         <div class="section__head">
           <div>
             <p class="eyebrow">03 / Using it</p>
-            <h2 class="section__title">Add the <em>GitGud source</em></h2>
+            <h2 class="section__title">Add <em>his patches</em></h2>
           </div>
           <p class="section__note">
-            Morphe's add-source link only accepts github.com and gitlab.com repositories, so a GitGud
-            source is added by hand — one paste, no account.
+            One tap, once the bundle is published. Morphe only accepts github.com and gitlab.com links,
+            so the link points at a GitLab repository that holds nothing but the metadata — the bundle
+            stays on GitGud.
           </p>
         </div>
 
@@ -302,6 +305,13 @@
                 GitHub token with <code class="inline-code">read:packages</code> for Morphe's Gradle
                 registry — and commits the result. There is nothing to do on your side; if it has not run
                 yet, the next step is not possible.
+                <br><br>
+                To build it yourself, the toolchain needs no system install:
+                <code class="inline-code">scripts/hoodles-bootstrap.sh</code> puts JDK 17 and the Android
+                SDK in <code class="inline-code">.toolchain/</code>, then
+                <code class="inline-code">scripts/hoodles-build.sh</code> builds with them as soon as a
+                <code class="inline-code">read:packages</code> token is in
+                <code class="inline-code">GITHUB_TOKEN</code>.
               </p>
             </div>
           </div>
@@ -310,6 +320,9 @@
             <div>
               <h3 class="step__title">Add his patches as a second source</h3>
               <p class="step__copy">
+                <a class="btn btn--primary btn--sm" href="https://morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches&amp;name=hoodles" data-hoodles-add aria-disabled="true" style="margin-bottom: 14px;">Add to Morphe</a>
+                <br>
+                Without the link, paste his source into <strong>Sources → + → Remote</strong>:
                 <code class="inline-code" id="hoodles-source">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/source.json</code>
                 <br>
                 <button class="btn btn--ghost btn--sm" type="button" data-copy="#hoodles-source" style="margin-top: 10px;">Copy source link</button>
@@ -342,6 +355,7 @@
           <h3>Mirror</h3>
           <ul>
             <li><a href="https://gitgud.io/xiondigital/MorphePatches">GitGud repository</a></li>
+            <li><a href="https://gitlab.com/XiONDiGiTaL/hoodles-morphe-patches">Metadata on GitLab</a></li>
             <li><a href="https://gitgud.io/xiondigital/MorphePatches/-/tree/main/hoodles">Hoodles sources</a></li>
             <li><a href="https://gitgud.io/xiondigital/MorphePatches/-/blob/main/MIRROR.md">Mirror notice</a></li>
             <li><a href="https://github.com/ameyamg/morphe-patches-hoodles">Surviving public mirror</a></li>

@@ -404,6 +404,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mirror-band__status { margin-top: 6px; max-width: 58ch; font-size: 0.72rem; color: var(--muted-dim); }
 .mirror-band__actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
+/* A value the page could not verify: shown, red, and never a version number. */
+.is-error { color: #ff9b9b; }
+
 /* ------------------------------------------------------------- responsive */
 @media (max-width: 900px) {
   .hero__inner { grid-template-columns: minmax(0, 1fr); }

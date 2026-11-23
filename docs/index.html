@@ -106,8 +106,12 @@
             <p class="eyebrow">Mirror</p>
             <h2 class="mirror-band__title">Mirror of the hoodles patches</h2>
             <p class="mirror-band__note">Hoodles' patch collection, kept on GitGud under the GPLv3.</p>
+            <p class="mirror-band__note mirror-band__status" data-hoodles-note>The button enables once the GitLab metadata resolves.</p>
           </div>
-          <a class="btn btn--ghost btn--sm" href="https://gitgud.io/xiondigital/MorphePatches/-/tree/main/hoodles">View the mirror ↗</a>
+          <div class="mirror-band__actions">
+            <a class="btn btn--primary btn--sm is-disabled" data-hoodles-add aria-disabled="true">Add hoodles to Morphe</a>
+            <a class="btn btn--ghost btn--sm" href="https://gitgud.io/xiondigital/MorphePatches/-/tree/main/hoodles">View the mirror ↗</a>
+          </div>
         </div>
       </div>
     </section>
@@ -562,6 +566,7 @@
   </footer>
 </div>
 
+<script src="hoodles-status.js"></script>
 <script>
   document.querySelectorAll("[data-copy]").forEach(function (button) {
     button.addEventListener("click", function () {

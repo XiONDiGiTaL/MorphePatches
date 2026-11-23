@@ -517,8 +517,9 @@
           </div>
           <p class="section__note">
             78 patches for 57 apps, written by <strong>hoodles</strong> under the GPLv3.
-            His repository was removed from GitHub in November 2026, so his source is mirrored on GitGud
-            with his license, name and credits intact. None of it is on this GitHub repository.
+            His repository was removed from GitHub in November 2026, so his source and a rebuilt 1.47.0
+            bundle are mirrored on GitGud with his license, name and credits intact. None of it is on this
+            GitHub repository.
           </p>
         </div>
 
@@ -528,14 +529,15 @@
             <p class="panel__note">
               This is a <strong>temporary mirror</strong>, not a fork: every patch in it was written by
               hoodles, the code stays under his GPLv3 license, and his LICENSE and NOTICE travel with it.
-              It exists because a takedown removed his repository and his signed release bundle, so the
-              source has nowhere else to live. If he asks for it to come down, it comes down. It is
-              maintained without his involvement and is not an endorsement by him.
+              A takedown removed his repository and his signed release bundle, so the mirror carries his
+              source and a rebuilt 1.47.0 bundle. The rebuild is unsigned and its SHA-256 is recorded in
+              <code class="inline-code">hoodles/source.json</code>. If he asks for it to come down, it
+              comes down. It is maintained without his involvement and is not an endorsement by him.
             </p>
             <div class="card__tags" style="margin-top: 16px; padding-top: 0;">
               <span class="chip chip--blue chip--dot">GPLv3</span>
-              <span class="chip">Source only</span>
-              <span class="chip" data-hoodles-chip>Checking bundle…</span>
+              <span class="chip">Source + rebuilt bundle</span>
+              <span class="chip" data-hoodles-chip>Bundle published</span>
               <span class="chip">Temporary</span>
             </div>
             <p style="margin-top: 16px;">
@@ -548,21 +550,25 @@
             <table class="table mirror-table">
               <tbody>
                 <tr><th scope="row">Mirror</th><td><a class="text-link" href="https://gitgud.io/xiondigital/MorphePatches/-/tree/main/hoodles">gitgud.io/xiondigital/MorphePatches/hoodles ↗</a></td></tr>
-                <tr><th scope="row">Author</th><td>hoodles — GPLv3, v1.47.0</td></tr>
-                <tr><th scope="row">Bundle</th><td><span data-hoodles-bundle>Checking…</span> — <code class="inline-code">scripts/hoodles-build.sh</code> builds it in CI</td></tr>
-                <tr><th scope="row">GitGud source</th><td><code class="inline-code" id="gitgud-source">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/patches-bundle.json</code></td></tr>
+                <tr><th scope="row">Author</th><td>hoodles, GPLv3, v1.47.0</td></tr>
+                <tr><th scope="row">Bundle</th><td><a class="text-link" href="https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/patches-1.47.0.mpp">patches-1.47.0.mpp ↗</a> · 5,641,808 bytes<br>SHA-256 <code class="inline-code">ef5e931ad9f2d4a54caf2ab1df073e1a05b47a707f6b1261fbe48ca27299109b</code></td></tr>
+                <tr><th scope="row">Hoodles source</th><td><code class="inline-code">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/hoodles/source.json</code></td></tr>
+                <tr><th scope="row">One-tap link</th><td><a class="text-link" href="https://morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches&amp;name=hoodles">morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches ↗</a></td></tr>
+                <tr><th scope="row">XiØN source</th><td><code class="inline-code" id="gitgud-source">https://gitgud.io/xiondigital/MorphePatches/-/raw/main/patches-bundle.json</code></td></tr>
               </tbody>
             </table>
             <p class="source-card__row" style="margin-top: 14px;">
-              <button class="btn btn--primary btn--sm" type="button" data-copy="#gitgud-source">+ Add to Morphe</button>
+              <a class="btn btn--primary btn--sm" href="https://morphe.software/add-source?gitlab=XiONDiGiTaL/hoodles-morphe-patches&amp;name=hoodles">Add hoodles to Morphe</a>
+              <button class="btn btn--ghost btn--sm" type="button" data-copy="#gitgud-source">Copy XiØN source</button>
               <a class="btn btn--ghost btn--sm" href="https://gitgud.io/xiondigital/MorphePatches">Repository</a>
             </p>
             <p class="panel__note">
-              <strong>+ Add to Morphe</strong> copies the GitGud source link. Morphe's add-source link
-              only accepts github.com and gitlab.com, so paste it in
-              <strong>Sources → + → Remote</strong> and tap Add. It serves the XiØN bundle hosted on
-              GitGud. <span data-hoodles-note>Whether his patches are also published as their own source
-              is checked live on <a class="text-link" href="hoodles.html">the Hoodles page ↗</a>.</span>
+              <strong>Add hoodles to Morphe</strong> opens the live one-tap link. The bundle is served
+              from GitGud, and the metadata the link reads is at
+              <code class="inline-code">gitlab.com/XiONDiGiTaL/hoodles-morphe-patches</code>. To add the
+              XiØN source instead, copy the XiØN link and paste it in
+              <strong>Sources → + → Remote</strong>. <span data-hoodles-note>The page checks the GitLab
+              metadata on load and reports whether the one-tap link resolves.</span>
             </p>
           </div>
         </div>

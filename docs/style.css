@@ -407,6 +407,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* A value the page could not verify: shown, red, and never a version number. */
 .is-error { color: #ff9b9b; }
 
+/* The small label under a version in the releases table. */
+.row-tag { font-family: var(--font-mono); font-size: 0.6rem; color: var(--muted-dim); }
+
 /* ------------------------------------------------------------- responsive */
 @media (max-width: 900px) {
   .hero__inner { grid-template-columns: minmax(0, 1fr); }

@@ -47,6 +47,70 @@
     }
   }
 
+  // The newest row of the releases table, built from the same metadata. Older rows stay in the page
+  // as history, and any one of them describing the live version is hidden so the table never lists
+  // that version twice.
+  function renderRow(data, version, date) {
+    var body = document.querySelector("[data-releases-body]");
+    if (!body) return;
+
+    // Only one row may be marked current, so earlier marks are cleared before this run decides.
+    Array.prototype.forEach.call(body.querySelectorAll("[data-release-row]"), function (row) {
+      var stale = row.querySelector(".row-tag");
+      if (!stale) return;
+      var br = stale.previousElementSibling;
+      if (br && br.tagName === "BR") br.remove();
+      stale.remove();
+    });
+
+    // A hand-written row for the live version is kept as it is and marked current, so its Contents
+    // text survives; a version with no row gets one built here instead.
+    var written = null;
+    Array.prototype.forEach.call(body.querySelectorAll("[data-release-row]"), function (row) {
+      if (row.getAttribute("data-release-row").replace(/^v/, "") === version) written = row;
+    });
+    if (written) {
+      var head = written.querySelector("th");
+      if (head && !head.querySelector(".row-tag")) {
+        var marker = document.createElement("span");
+        marker.className = "row-tag";
+        marker.textContent = "current";
+        head.appendChild(document.createElement("br"));
+        head.appendChild(marker);
+      }
+      return;
+    }
+
+    var row = document.createElement("tr");
+
+    var versionCell = document.createElement("th");
+    versionCell.setAttribute("scope", "row");
+    var link = document.createElement("a");
+    link.className = "text-link";
+    link.href = "https://github.com/XiONDiGiTaL/MorphePatches/releases/tag/v" + version;
+    link.textContent = "v" + version;
+    var tag = document.createElement("span");
+    tag.className = "row-tag";
+    tag.textContent = "current";
+    versionCell.appendChild(link);
+    versionCell.appendChild(document.createElement("br"));
+    versionCell.appendChild(tag);
+
+    function cell(text) {
+      var td = document.createElement("td");
+      td.textContent = text;
+      return td;
+    }
+
+    var summary = data && typeof data.summary === "string" ? data.summary.trim() : "";
+
+    row.appendChild(versionCell);
+    row.appendChild(cell(date));
+    row.appendChild(cell("patches-" + version + ".mpp"));
+    row.appendChild(cell(summary || "See the release notes for this version."));
+    body.insertBefore(row, body.firstElementChild);
+  }
+
   function render(data) {
     var version = data && data.version ? String(data.version).trim() : "";
     if (!version) {
@@ -57,7 +121,10 @@
     setText("[data-release-version]", "v" + version, false);
 
     var date = data && typeof data.created_at === "string" ? data.created_at.slice(0, 10) : "";
-    setText("[data-release-date]", /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "unknown", false);
+    var dateText = /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : "unknown";
+    setText("[data-release-date]", dateText, false);
+
+    renderRow(data, version, dateText);
   }
 
   if (!window.fetch) {
